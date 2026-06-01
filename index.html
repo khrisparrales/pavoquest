@@ -662,9 +662,9 @@
     // =========================================================================
     const isCanvasEnvironment = typeof __firebase_config !== 'undefined' && __firebase_config;
     
-    // Configuración local del usuario (Sincronizada con Firebase Console)
+    // Configuración local del usuario (Sincronizada con tu consola de Firebase)
     let firebaseConfig = {
-      apiKey: "",
+      apiKey: "AIzaSyC9vNJDaIfrG5BiJfYP50qr-TF-uD6qqGo",
       authDomain: "pavoquest.firebaseapp.com",
       projectId: "pavoquest",
       storageBucket: "pavoquest.firebasestorage.app",
@@ -686,10 +686,27 @@
     import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Inicialización de los servicios de Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    // Inicialización segura de los servicios de Firebase para evitar crashes por API Key vacía
+    let app = null;
+    let auth = null;
+    let db = null;
+    let firebaseEnabled = false;
+
+    // Verificar si la configuración tiene una API Key válida o está en Canvas
+    const hasValidApiKey = firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey !== "TU_API_KEY_AQUI" && firebaseConfig.apiKey.trim() !== "";
+    const canInitializeFirebase = isCanvasEnvironment || hasValidApiKey;
+
+    if (canInitializeFirebase) {
+      try {
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+        firebaseEnabled = true;
+      } catch (e) {
+        console.error("Error al inicializar Firebase:", e);
+        firebaseEnabled = false;
+      }
+    }
 
     // Definición de Temas Visuales (Arreglo de consistencia para cambio estético)
     const THEMES = {
@@ -760,6 +777,19 @@
 
     // Conexión y Autenticación Firebase (Inicio invisible para seguridad)
     const initAuth = async () => {
+      // Si Firebase no está configurado, pasamos directamente a modo offline (LocalStorage)
+      if (!firebaseEnabled) {
+        document.getElementById('cloud-status-text').innerText = "Modo Local";
+        document.getElementById('cloud-status-icon').className = "w-2 h-2 rounded-full bg-amber-500 animate-pulse";
+        document.getElementById('user-id-display').innerText = "Falta configurar apiKey en tu index.html";
+        document.getElementById('btn-reset-sync-id').classList.add('hidden');
+        document.getElementById('sync-id-type-label').innerText = "Sincronización Desactivada";
+        
+        loadLocalStorageFallback();
+        showToast("Modo Local Activo", "Los datos se guardarán en este navegador. Configura la API Key para sincronizar.", "warning");
+        return;
+      }
+
       try {
         document.getElementById('cloud-status-text').innerText = "Conectando...";
         document.getElementById('cloud-status-icon').className = "w-2 h-2 rounded-full bg-yellow-400 animate-pulse";
@@ -795,31 +825,38 @@
         console.error("Fallo de autenticación Firebase:", e);
         document.getElementById('cloud-status-text').innerText = "Error Con.";
         document.getElementById('cloud-status-icon').className = "w-2 h-2 rounded-full bg-red-400";
+        // Si falla la conexión de red o auth de Firebase, también intentamos recuperar local por si acaso
+        loadLocalStorageFallback();
       }
     };
 
     // Escuchador del estado de autenticación (Carga de Firestore dinámica)
-    onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        // Si no hay override manual, usamos el del usuario autenticado
-        const savedOverrideId = localStorage.getItem('pavoquest_override_sync_id');
-        activeSyncId = savedOverrideId || currentUser.uid;
-        document.getElementById('user-id-display').innerText = activeSyncId;
-        document.getElementById('cloud-status-text').innerText = "Autenticado";
-        document.getElementById('cloud-status-icon').className = "w-2 h-2 rounded-full bg-emerald-400";
-      } else {
-        document.getElementById('user-id-display').innerText = "No Autenticado";
-        document.getElementById('cloud-status-text').innerText = "Sin Conexión";
-        document.getElementById('cloud-status-icon').className = "w-2 h-2 rounded-full bg-gray-500";
-      }
-    });
+    if (firebaseEnabled && auth) {
+      onAuthStateChanged(auth, (currentUser) => {
+        if (currentUser) {
+          // Si no hay override manual, usamos el del usuario autenticado
+          const savedOverrideId = localStorage.getItem('pavoquest_override_sync_id');
+          activeSyncId = savedOverrideId || currentUser.uid;
+          document.getElementById('user-id-display').innerText = activeSyncId;
+          document.getElementById('cloud-status-text').innerText = "Autenticado";
+          document.getElementById('cloud-status-icon').className = "w-2 h-2 rounded-full bg-emerald-400";
+        } else {
+          document.getElementById('user-id-display').innerText = "No Autenticado";
+          document.getElementById('cloud-status-text').innerText = "Sin Conexión";
+          document.getElementById('cloud-status-icon').className = "w-2 h-2 rounded-full bg-gray-500";
+        }
+      });
+    }
 
     // Iniciar Autenticación inmediatamente
     initAuth();
 
     // Guardado seguro a la nube (Firestore) utilizando activeSyncId
     async function saveToCloud() {
-      if (!auth.currentUser || !activeSyncId) return;
+      // Siempre guardamos en LocalStorage como copia de seguridad inmediata
+      saveLocalStorageFallback();
+
+      if (!firebaseEnabled || !auth || !auth.currentUser || !activeSyncId) return;
       const userStateDoc = doc(db, 'artifacts', appId, 'users', activeSyncId, 'user_data', 'state');
       
       const dataToSave = {
@@ -845,7 +882,7 @@
 
     // Escucha en tiempo real de Firestore utilizando activeSyncId
     function listenToCloud(syncId) {
-      if (!syncId) return;
+      if (!firebaseEnabled || !syncId) return;
 
       // Desuscribirse de escuchas anteriores para evitar fugas de memoria o colisiones de datos
       if (unsubscribeSnapshot) {
@@ -899,6 +936,10 @@
 
     // Conectar un ID manual ingresado por el usuario
     function connectManualSyncId() {
+      if (!firebaseEnabled) {
+        showToast("Imposible Sincronizar", "Debes configurar primero la API Key de Firebase en tu index.html.", "error");
+        return;
+      }
       const manualId = document.getElementById('manual-sync-id-input').value.trim();
       
       if (!manualId) {
@@ -938,16 +979,23 @@
         function() {
           localStorage.removeItem('pavoquest_override_sync_id');
           
-          if (auth.currentUser) {
+          if (firebaseEnabled && auth && auth.currentUser) {
             activeSyncId = auth.currentUser.uid;
             document.getElementById('user-id-display').innerText = activeSyncId;
+          } else {
+            activeSyncId = null;
+            document.getElementById('user-id-display').innerText = "Falta configurar apiKey";
           }
           
           document.getElementById('btn-reset-sync-id').classList.add('hidden');
-          document.getElementById('sync-id-type-label').innerText = "ID de Sincronización (Local)";
+          document.getElementById('sync-id-type-label').innerText = firebaseEnabled ? "ID de Sincronización (Local)" : "Sincronización Desactivada";
 
           isInitialLoad = true;
-          listenToCloud(activeSyncId);
+          if (firebaseEnabled) {
+            listenToCloud(activeSyncId);
+          } else {
+            loadLocalStorageFallback();
+          }
           showToast("ID Restablecido", "Volviste a tu ID de dispositivo local.", "success");
         }
       );
@@ -956,9 +1004,9 @@
 
     // Copiar ID de sincronización al portapapeles
     function copySyncId() {
-      const uid = activeSyncId || (auth.currentUser ? auth.currentUser.uid : "");
+      const uid = activeSyncId || (firebaseEnabled && auth && auth.currentUser ? auth.currentUser.uid : "");
       if (!uid) {
-        showToast("Error", "Aún no te has conectado a la nube.", "error");
+        showToast("Error", "Sincronización desactivada. Configura la API Key de Firebase.", "error");
         return;
       }
       const tempInput = document.createElement("input");
@@ -968,6 +1016,52 @@
       document.execCommand("copy");
       document.body.removeChild(tempInput);
       showToast("Copiado", "ID de Sincronización copiado con éxito.", "success");
+    }
+
+    // =========================================================================
+    //   MÉTODOS DE RESPALDO DE LOCAL STORAGE (Para modo offline o sin API Key)
+    // =========================================================================
+    function saveLocalStorageFallback() {
+      try {
+        localStorage.setItem('pavoquest_local_state', JSON.stringify({
+          balance: state.balance,
+          goalName: state.goalName,
+          goalCost: state.goalCost,
+          habits: state.habits,
+          claimedHistory: state.claimedHistory,
+          history: state.history,
+          lastSavedDate: state.lastSavedDate,
+          activeTheme: state.activeTheme
+        }));
+      } catch (e) {
+        console.error("Error al guardar en LocalStorage:", e);
+      }
+    }
+
+    function loadLocalStorageFallback() {
+      try {
+        const localData = localStorage.getItem('pavoquest_local_state');
+        if (localData) {
+          const data = JSON.parse(localData);
+          state.balance = data.balance ?? state.balance;
+          state.goalName = data.goalName ?? state.goalName;
+          state.goalCost = data.goalCost ?? state.goalCost;
+          state.habits = data.habits ?? state.habits;
+          state.claimedHistory = data.claimedHistory ?? state.claimedHistory;
+          state.history = data.history ?? state.history;
+          state.lastSavedDate = data.lastSavedDate ?? state.lastSavedDate;
+          state.activeTheme = data.activeTheme ?? state.activeTheme;
+
+          setUITheme(state.activeTheme, false);
+          updateClockAndUI();
+          renderCalendar();
+          updateHabitsListUI();
+          updateExpensesListUI();
+          updateHistoryUI();
+        }
+      } catch (e) {
+        console.error("Error al cargar de LocalStorage:", e);
+      }
     }
 
     // Inicializaciones y lógica del ciclo de renderizado
@@ -1429,40 +1523,6 @@
       updateClockAndUI();
       renderCalendar();
       showToast("Balance Guardado", "Se actualizó tu balance inicial de Pavos correctamente.", "success");
-    }
-
-    function saveNewGoal() {
-      const name = document.getElementById('goal-name-input').value.trim() || "Pase de Batalla";
-      const cost = parseInt(document.getElementById('goal-cost-input').value);
-
-      if (isNaN(cost) || cost <= 0) {
-        showToast("Error de datos", "Por favor ingresa un costo de Pavos válido.", "error");
-        return;
-      }
-
-      state.goalName = name;
-      state.goalCost = cost;
-      
-      saveToCloud();
-      closeEditGoalModal();
-      updateClockAndUI();
-      renderCalendar();
-      showToast("Meta Actualizada", `Objetivo fijado en ${name}. ¡A por él!`, "success");
-    }
-
-    function clearHistoryWithModal() {
-      openConfirmModal(
-        "Limpiar Historial",
-        "¿Confirmas reiniciar el historial de reclamos? Tu saldo actual no se modificará.",
-        function() {
-          state.claimedHistory = [];
-          saveToCloud();
-          updateClockAndUI();
-          renderCalendar();
-          updateHistoryUI();
-          showToast("Historial Limpiado", "Se borraron los registros de reclamaciones.", "success");
-        }
-      );
     }
 
     // Inyectores estáticos para vinculación HTML global
