@@ -6,7 +6,7 @@
   <title>PavoQuest - Hábitos, Pavos, Metas y Gastos con Sincronización</title>
   <!-- Tailwind CSS para diseño responsivo, fluido y moderno -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts premium de alta legibilidad -->
+  <!-- Google Fonts de alta legibilidad -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
@@ -31,7 +31,7 @@
 
     .theme-card {
       background-color: var(--bg-card);
-      border-color: var(--border-color);
+      border: 1px solid var(--border-color);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -54,7 +54,7 @@
       animation: pulse-gold 2.5s infinite;
     }
 
-    /* Scrollbar */
+    /* Scrollbar minimalista */
     ::-webkit-scrollbar {
       width: 6px;
     }
@@ -145,8 +145,8 @@
       <!-- COLUMNA IZQUIERDA: Balance, Sincronización, Metas y Checklist de Hábitos -->
       <div class="lg:col-span-1 flex flex-col gap-6">
 
-        <!-- Balance Total de Pavos -->
-        <div class="theme-card border rounded-2xl p-6 relative overflow-hidden shadow-xl">
+        <!-- Balance Total de Pavos e Información de Jugador -->
+        <div class="theme-card rounded-2xl p-6 relative overflow-hidden shadow-xl">
           <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full blur-2xl opacity-10" style="background-color: var(--primary)"></div>
           <div class="flex justify-between items-start">
             <div>
@@ -163,11 +163,22 @@
               </svg>
             </button>
           </div>
-          <p class="text-[11px] text-gray-400 mt-3">Consigue 100 Ⓟ diarios completando tus hábitos y reclamándolos a las 7:00 PM.</p>
+          
+          <!-- Sistema de Nivel y XP Gamificado -->
+          <div class="mt-4 pt-4 border-t theme-border space-y-2">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-bold text-gray-400">Nivel de Hábito: <span id="player-level" class="text-white font-extrabold" style="color: var(--primary)">Lvl 1</span></span>
+              <span id="player-xp-display" class="text-gray-400 font-semibold font-mono">0 / 100 XP</span>
+            </div>
+            <div class="w-full bg-black/50 h-2 rounded-full overflow-hidden border theme-border">
+              <div id="player-xp-bar" class="h-full rounded-full transition-all duration-500" style="background: linear-gradient(90deg, var(--secondary), var(--accent)); width: 0%"></div>
+            </div>
+            <p class="text-[9px] text-gray-500 italic">Gana 10 XP por cada hábito que completes hoy.</p>
+          </div>
         </div>
 
         <!-- Tarjeta de Sincronización Multi-dispositivo -->
-        <div class="theme-card border rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="theme-card rounded-2xl p-6 shadow-xl space-y-4">
           <div class="flex justify-between items-center">
             <h3 class="font-extrabold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
               <span>☁️</span> Conexión Cloud
@@ -177,22 +188,32 @@
               <span id="cloud-status-text">Iniciando...</span>
             </span>
           </div>
-          <p class="text-[11px] text-gray-400">Tus hábitos, metas y gastos están respaldados en la nube. Tu ID de Sincronización te identifica de forma única:</p>
+          <p class="text-[11px] text-gray-400">Tus hábitos, metas y gastos están respaldados en la nube. Puedes copiar tu ID para cargarlo en otro dispositivo:</p>
           <div class="bg-black/40 p-3 rounded-xl border theme-border space-y-2">
-            <span class="text-[9px] text-gray-500 uppercase font-bold tracking-wider">ID de Sincronización Completo</span>
+            <span class="text-[9px] text-gray-500 uppercase font-bold tracking-wider block" id="sync-id-type-label">ID de Sincronización</span>
             <div class="flex items-center gap-2">
               <div id="user-id-display" class="text-[10px] font-mono font-semibold text-gray-300 truncate select-all bg-black/60 p-2 rounded-lg border theme-border flex-grow">
                 Conectando...
               </div>
-              <button onclick="copySyncId()" class="p-2 text-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20 rounded-xl transition shrink-0" title="Copiar ID Completo">
+              <button onclick="copySyncId()" class="p-2 text-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20 rounded-xl transition shrink-0" title="Copiar ID">
                 📋
+              </button>
+            </div>
+            
+            <!-- Botones de Acción de Sincronización Manual -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+              <button onclick="openSyncIdModal()" class="w-full py-1.5 px-2.5 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 text-[10px] font-bold border border-yellow-500/20 transition flex items-center justify-center gap-1">
+                🔌 Vincular otro ID
+              </button>
+              <button id="btn-reset-sync-id" onclick="resetToDefaultSyncId()" class="hidden w-full py-1.5 px-2.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-[10px] font-bold border border-red-500/20 transition flex items-center justify-center gap-1">
+                🔄 Restablecer ID
               </button>
             </div>
           </div>
         </div>
 
         <!-- Rastreador de Objetivos / Metas de Compra -->
-        <div class="theme-card border rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="theme-card rounded-2xl p-6 shadow-xl space-y-4">
           <div class="flex justify-between items-center">
             <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
               <span>🎯</span> Meta de Compra
@@ -232,7 +253,7 @@
         </div>
 
         <!-- Checklist Diario de Hábitos -->
-        <div class="theme-card border rounded-2xl p-6 shadow-xl space-y-4 relative overflow-hidden">
+        <div class="theme-card rounded-2xl p-6 shadow-xl space-y-4 relative overflow-hidden">
           <div class="flex justify-between items-center">
             <div>
               <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
@@ -243,6 +264,17 @@
             <button onclick="openAddHabitModal()" class="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-black/40 hover:bg-black/80 border theme-border text-gray-200 hover:text-white transition">
               + Añadir
             </button>
+          </div>
+
+          <!-- Presets Rápidos de Hábitos -->
+          <div class="space-y-1.5">
+            <p class="text-[9px] text-gray-500 uppercase font-bold">Añadir rápidos:</p>
+            <div class="flex flex-wrap gap-1">
+              <button onclick="addPresetHabit('💧 Beber Agua (2L)', '💧')" class="text-[10px] bg-black/40 hover:bg-black/80 border theme-border px-2 py-1 rounded-lg text-gray-300 transition">+ 💧 Agua</button>
+              <button onclick="addPresetHabit('🏋️ Entrenar (30m)', '🏋️')" class="text-[10px] bg-black/40 hover:bg-black/80 border theme-border px-2 py-1 rounded-lg text-gray-300 transition">+ 🏋️ Gym</button>
+              <button onclick="addPresetHabit('📚 Leer 15 minutos', '📚')" class="text-[10px] bg-black/40 hover:bg-black/80 border theme-border px-2 py-1 rounded-lg text-gray-300 transition">+ 📚 Leer</button>
+              <button onclick="addPresetHabit('🧘 Meditar (5m)', '🧘')" class="text-[10px] bg-black/40 hover:bg-black/80 border theme-border px-2 py-1 rounded-lg text-gray-300 transition">+ 🧘 Meditar</button>
+            </div>
           </div>
 
           <!-- Barra de Progreso del Checklist -->
@@ -271,7 +303,7 @@
       <div class="lg:col-span-2 flex flex-col gap-6">
 
         <!-- Panel de Reclamación diaria (7 PM) -->
-        <div id="reward-panel" class="theme-card border rounded-2xl p-6 relative overflow-hidden shadow-xl flex flex-col justify-between min-h-[220px]">
+        <div id="reward-panel" class="theme-card rounded-2xl p-6 relative overflow-hidden shadow-xl flex flex-col justify-between min-h-[220px]">
           <!-- Brillo de fondo coordinado -->
           <div class="absolute -right-10 -top-10 w-36 h-36 rounded-full blur-3xl opacity-10" style="background-color: var(--secondary)"></div>
 
@@ -306,7 +338,7 @@
         </div>
 
         <!-- Módulo de Control de Gastos Diarios -->
-        <div class="theme-card border rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="theme-card rounded-2xl p-6 shadow-xl space-y-4">
           <div class="flex justify-between items-center">
             <div>
               <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
@@ -346,7 +378,7 @@
         </div>
 
         <!-- Calendario de Consistencia e Historial -->
-        <div class="theme-card border rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+        <div class="theme-card rounded-2xl p-6 shadow-xl flex flex-col justify-between">
           <div>
             <!-- Header Calendario -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
@@ -413,7 +445,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           <!-- Consola de Simulación -->
-          <div class="theme-card border rounded-2xl p-6 shadow-xl">
+          <div class="theme-card rounded-2xl p-6 shadow-xl">
             <div class="flex items-center gap-2 mb-2">
               <span class="text-base">🧪</span>
               <h3 class="font-bold text-xs text-white uppercase tracking-wider">Consola del Simulador</h3>
@@ -448,7 +480,7 @@
           </div>
 
           <!-- Historial de Operaciones -->
-          <div class="theme-card border rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+          <div class="theme-card rounded-2xl p-6 shadow-xl flex flex-col justify-between">
             <div>
               <div class="flex justify-between items-center mb-3">
                 <h3 class="font-bold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
@@ -473,7 +505,7 @@
 
   <!-- MODAL: Ajuste de Balance -->
   <div id="edit-balance-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="theme-card border rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+    <div class="theme-card rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
       <div class="flex justify-between items-center">
         <h3 class="text-base font-bold text-white">Ajustar Balance de Pavos</h3>
         <button onclick="closeEditBalanceModal()" class="text-gray-400 hover:text-white p-1">
@@ -505,7 +537,7 @@
 
   <!-- MODAL: Editar Metas -->
   <div id="edit-goal-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="theme-card border rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+    <div class="theme-card rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
       <div class="flex justify-between items-center">
         <h3 class="text-base font-bold text-white">Editar Meta de Ahorro</h3>
         <button onclick="closeEditGoalModal()" class="text-gray-400 hover:text-white p-1">
@@ -542,9 +574,38 @@
     </div>
   </div>
 
+  <!-- MODAL: Vincular ID Manual de Sincronización -->
+  <div id="sync-id-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="theme-card rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+      <div class="flex justify-between items-center">
+        <h3 class="text-base font-bold text-white">Sincronizar Dispositivo</h3>
+        <button onclick="closeSyncIdModal()" class="text-gray-400 hover:text-white p-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <p class="text-xs text-gray-400 leading-relaxed">Pega aquí el ID de sincronización de tu otro dispositivo. Esto cargará de inmediato tu balance, tus metas, hábitos y gastos.</p>
+      
+      <div>
+        <label for="manual-sync-id-input" class="block text-[9px] font-bold text-gray-500 uppercase mb-1">ID de tu otro dispositivo</label>
+        <input type="text" id="manual-sync-id-input" class="w-full bg-black/50 border theme-border focus:border-yellow-500 text-white rounded-xl px-4 py-3 text-xs font-mono font-bold focus:outline-none" placeholder="Pega el ID aquí...">
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 pt-2">
+        <button onclick="closeSyncIdModal()" class="py-2.5 rounded-xl text-xs font-bold text-gray-400 bg-black/30 hover:bg-black/50 transition">
+          Cancelar
+        </button>
+        <button onclick="connectManualSyncId()" class="py-2.5 rounded-xl text-xs font-bold text-black transition bg-yellow-500 hover:bg-yellow-400" style="background-color: var(--primary)">
+          🔌 Sincronizar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: Añadir Hábito Nuevo -->
   <div id="add-habit-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="theme-card border rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+    <div class="theme-card rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
       <div class="flex justify-between items-center">
         <h3 class="text-base font-bold text-white">Nuevo Hábito Diario</h3>
         <button onclick="closeAddHabitModal()" class="text-gray-400 hover:text-white p-1">
@@ -579,7 +640,7 @@
 
   <!-- MODAL DE CONFIRMACIÓN DE ACCIONES (SUSTITUYE CONFIRM NATIVO) -->
   <div id="confirm-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-[60] flex items-center justify-center p-4">
-    <div class="theme-card border rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+    <div class="theme-card rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
       <h3 id="confirm-title" class="text-base font-bold text-white">¿Confirmar Acción?</h3>
       <p id="confirm-message" class="text-xs text-gray-400 leading-relaxed">¿Estás seguro de que deseas proceder?</p>
       
@@ -601,9 +662,9 @@
     // =========================================================================
     const isCanvasEnvironment = typeof __firebase_config !== 'undefined' && __firebase_config;
     
-    // Configuración local enlazada directamente a tu consola Firebase
+    // Configuración local del usuario (Sincronizada con Firebase Console)
     let firebaseConfig = {
-      apiKey: "AIzaSyC9vNJDaIfrG5BiJfYP50qr-TF-uD6qqGo",
+      apiKey: "",
       authDomain: "pavoquest.firebaseapp.com",
       projectId: "pavoquest",
       storageBucket: "pavoquest.firebasestorage.app",
@@ -625,7 +686,7 @@
     import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Inicialización del servicio
+    // Inicialización de los servicios de Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -686,7 +747,7 @@
       simulationActive: false,
       simulatedTime: null,
       calendarYear: 2026,
-      calendarMonth: 4, // Mayo
+      calendarMonth: 5, // Junio (0-indexed -> 5)
       activeTheme: 'fortnite',
       lastSavedDate: "",
       selectedProjectionDate: null
@@ -694,17 +755,41 @@
 
     let localLastUpdated = 0;
     let isInitialLoad = true;
+    let unsubscribeSnapshot = null; // Guardar referencia de desuscripción de firestore
+    let activeSyncId = null; // ID que usaremos para leer y escribir en firestore
 
-    // Conexión y Autenticación Firebase (Regla 3)
+    // Conexión y Autenticación Firebase (Inicio invisible para seguridad)
     const initAuth = async () => {
       try {
         document.getElementById('cloud-status-text').innerText = "Conectando...";
         document.getElementById('cloud-status-icon').className = "w-2 h-2 rounded-full bg-yellow-400 animate-pulse";
         
+        let userCredential;
         if (isCanvasEnvironment && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
+          userCredential = await signInWithCustomToken(auth, __initial_auth_token);
         } else {
-          await signInAnonymously(auth);
+          userCredential = await signInAnonymously(auth);
+        }
+
+        const user = userCredential.user;
+        if (user) {
+          // Verificar si ya tenemos un ID de sincronización personalizado guardado en este navegador
+          const savedOverrideId = localStorage.getItem('pavoquest_override_sync_id');
+          if (savedOverrideId) {
+            activeSyncId = savedOverrideId;
+            document.getElementById('btn-reset-sync-id').classList.remove('hidden');
+            document.getElementById('sync-id-type-label').innerText = "ID de Sincronización (Vinculado)";
+          } else {
+            activeSyncId = user.uid;
+            document.getElementById('btn-reset-sync-id').classList.add('hidden');
+            document.getElementById('sync-id-type-label').innerText = "ID de Sincronización (Local)";
+          }
+
+          document.getElementById('user-id-display').innerText = activeSyncId;
+          document.getElementById('cloud-status-text').innerText = "Autenticado";
+          document.getElementById('cloud-status-icon').className = "w-2 h-2 rounded-full bg-emerald-400";
+          
+          listenToCloud(activeSyncId);
         }
       } catch (e) {
         console.error("Fallo de autenticación Firebase:", e);
@@ -713,15 +798,15 @@
       }
     };
 
-    // Escuchador de estado de autenticación
+    // Escuchador del estado de autenticación (Carga de Firestore dinámica)
     onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        document.getElementById('user-id-display').innerText = currentUser.uid;
+        // Si no hay override manual, usamos el del usuario autenticado
+        const savedOverrideId = localStorage.getItem('pavoquest_override_sync_id');
+        activeSyncId = savedOverrideId || currentUser.uid;
+        document.getElementById('user-id-display').innerText = activeSyncId;
         document.getElementById('cloud-status-text').innerText = "Autenticado";
-        document.getElementById('cloud-status-icon').className = "w-2 h-2 rounded-full bg-blue-400";
-        
-        // Carga y escucha en tiempo real de Firestore
-        listenToCloud(currentUser.uid);
+        document.getElementById('cloud-status-icon').className = "w-2 h-2 rounded-full bg-emerald-400";
       } else {
         document.getElementById('user-id-display').innerText = "No Autenticado";
         document.getElementById('cloud-status-text').innerText = "Sin Conexión";
@@ -732,11 +817,10 @@
     // Iniciar Autenticación inmediatamente
     initAuth();
 
-    // Guardado a la nube (Firestore) siguiendo la ruta privada estricta (Regla 1)
+    // Guardado seguro a la nube (Firestore) utilizando activeSyncId
     async function saveToCloud() {
-      if (!auth.currentUser) return;
-      const userId = auth.currentUser.uid;
-      const userStateDoc = doc(db, 'artifacts', appId, 'users', userId, 'user_data', 'state');
+      if (!auth.currentUser || !activeSyncId) return;
+      const userStateDoc = doc(db, 'artifacts', appId, 'users', activeSyncId, 'user_data', 'state');
       
       const dataToSave = {
         balance: state.balance,
@@ -755,14 +839,22 @@
         await setDoc(userStateDoc, dataToSave);
       } catch (err) {
         console.error("Fallo al guardar en Firestore:", err);
+        showToast("Error de Guardado", "No se pudo sincronizar el cambio con la nube.", "error");
       }
     }
 
-    // Escucha en tiempo real (Sincronización bidireccional instantánea)
-    function listenToCloud(userId) {
-      const userStateDoc = doc(db, 'artifacts', appId, 'users', userId, 'user_data', 'state');
+    // Escucha en tiempo real de Firestore utilizando activeSyncId
+    function listenToCloud(syncId) {
+      if (!syncId) return;
+
+      // Desuscribirse de escuchas anteriores para evitar fugas de memoria o colisiones de datos
+      if (unsubscribeSnapshot) {
+        unsubscribeSnapshot();
+      }
       
-      onSnapshot(userStateDoc, (snapshotDoc) => {
+      const userStateDoc = doc(db, 'artifacts', appId, 'users', syncId, 'user_data', 'state');
+      
+      unsubscribeSnapshot = onSnapshot(userStateDoc, (snapshotDoc) => {
         if (snapshotDoc.exists()) {
           const data = snapshotDoc.data();
           
@@ -805,9 +897,66 @@
       });
     }
 
-    // Copiar ID de sincronización al portapapeles usando el método recomendado
+    // Conectar un ID manual ingresado por el usuario
+    function connectManualSyncId() {
+      const manualId = document.getElementById('manual-sync-id-input').value.trim();
+      
+      if (!manualId) {
+        showToast("Error de ID", "Por favor ingresa un ID válido.", "error");
+        return;
+      }
+
+      if (manualId.length < 10) {
+        showToast("ID Inválido", "El ID ingresado parece ser demasiado corto.", "warning");
+        return;
+      }
+
+      // Guardamos la configuración en LocalStorage para recordar el ID conectado
+      localStorage.setItem('pavoquest_override_sync_id', manualId);
+      activeSyncId = manualId;
+
+      // Actualizar UI
+      document.getElementById('user-id-display').innerText = activeSyncId;
+      document.getElementById('btn-reset-sync-id').classList.remove('hidden');
+      document.getElementById('sync-id-type-label').innerText = "ID de Sincronización (Vinculado)";
+
+      // Forzar carga de datos de la nueva cuenta
+      isInitialLoad = true;
+      listenToCloud(activeSyncId);
+      closeSyncIdModal();
+      
+      showToast("Sincronizando...", "ID cargado con éxito. Tus datos se están importando...", "success");
+      playClaimSound();
+    }
+    window.connectManualSyncId = connectManualSyncId;
+
+    // Restablecer el ID por defecto del dispositivo actual
+    function resetToDefaultSyncId() {
+      openConfirmModal(
+        "Restablecer Sincronización",
+        "¿Quieres desconectarte de este ID y volver al predeterminado del dispositivo?",
+        function() {
+          localStorage.removeItem('pavoquest_override_sync_id');
+          
+          if (auth.currentUser) {
+            activeSyncId = auth.currentUser.uid;
+            document.getElementById('user-id-display').innerText = activeSyncId;
+          }
+          
+          document.getElementById('btn-reset-sync-id').classList.add('hidden');
+          document.getElementById('sync-id-type-label').innerText = "ID de Sincronización (Local)";
+
+          isInitialLoad = true;
+          listenToCloud(activeSyncId);
+          showToast("ID Restablecido", "Volviste a tu ID de dispositivo local.", "success");
+        }
+      );
+    }
+    window.resetToDefaultSyncId = resetToDefaultSyncId;
+
+    // Copiar ID de sincronización al portapapeles
     function copySyncId() {
-      const uid = auth.currentUser ? auth.currentUser.uid : "";
+      const uid = activeSyncId || (auth.currentUser ? auth.currentUser.uid : "");
       if (!uid) {
         showToast("Error", "Aún no te has conectado a la nube.", "error");
         return;
@@ -840,9 +989,8 @@
       // Mostrar fecha de misiones
       document.getElementById('checklist-date-title').innerText = `Tareas correspondientes al ${now.getDate()} de ${MONTHS_ES[now.getMonth()]}`;
 
-      // Manejo de Cambio de Día (Reset diario automático)
+      // Manejo de Cambio de Día (Reset diario automático de hábitos)
       if (state.lastSavedDate !== "" && state.lastSavedDate !== todayStr) {
-        // Guardar el estado del checklist de hábitos del día anterior antes de reiniciar
         saveDayToHistory(state.lastSavedDate);
 
         // Resetear habits para el nuevo día
@@ -892,7 +1040,7 @@
 
       const target7PM = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 19, 0, 0);
 
-      // Calcular pago dinámico estimado
+      // Calcular pago dinámico estimado (+50 de Bonus por consistencia)
       const allDone = state.habits.length > 0 && state.habits.every(h => h.done);
       const payoutVal = allDone ? 150 : 100;
       estimatedPayout.innerText = `${payoutVal} Ⓟ`;
@@ -951,9 +1099,10 @@
       updateProjectionDetailBox();
       updateGoalTrackerUI();
       updateExpensesTotalUI();
+      updatePlayerLevelUI();
     }
 
-    // Configuración del Tema Visual
+    // Configuración del Tema Visual dinámico
     function setUITheme(key, pushToCloud = true) {
       if (!THEMES[key]) return;
       state.activeTheme = key;
@@ -1045,7 +1194,7 @@
       if (state.habits.length === 0) {
         listContainer.innerHTML = `
           <div class="text-center py-6 text-xs text-gray-500">
-            No tienes hábitos registrados hoy. ¡Usa el botón "+ Añadir" para crear uno!
+            No tienes hábitos registrados hoy. ¡Usa el botón "+ Añadir" o los Presets para crear uno!
           </div>
         `;
         return;
@@ -1111,6 +1260,29 @@
       showToast("Hábito Registrado", `"${name}" se añadió correctamente.`, "success");
     }
 
+    // Función para Presets rápidos de hábitos
+    function addPresetHabit(name, icon) {
+      if (state.habits.some(h => h.name === name)) {
+        showToast("Hábito existente", "Ese hábito ya está en tu lista.", "warning");
+        return;
+      }
+
+      const newId = 'h-' + Date.now();
+      state.habits.push({
+        id: newId,
+        name: name,
+        icon: icon,
+        done: false
+      });
+
+      saveToCloud();
+      updateHabitsListUI();
+      updateClockAndUI();
+      renderCalendar();
+      showToast("Hábito Registrado", `"${name}" se añadió correctamente desde predefinidos.`, "success");
+    }
+    window.addPresetHabit = addPresetHabit;
+
     function deleteHabitWithModal(habitId) {
       const habit = state.habits.find(h => h.id === habitId);
       const name = habit ? habit.name : "este hábito";
@@ -1124,7 +1296,7 @@
           updateClockAndUI();
           updateHabitsListUI();
           renderCalendar();
-          showToast("Hábito Eliminar", "Se removió de la lista diaria.", "warning");
+          showToast("Hábito Eliminado", "Se removió de la lista diaria.", "warning");
         }
       );
     }
@@ -1270,6 +1442,7 @@
 
       state.goalName = name;
       state.goalCost = cost;
+      
       saveToCloud();
       closeEditGoalModal();
       updateClockAndUI();
@@ -1292,7 +1465,7 @@
       );
     }
 
-    // Inyectores estáticos para vinculación HTML
+    // Inyectores estáticos para vinculación HTML global
     window.setUITheme = setUITheme;
     window.toggleHabit = toggleHabit;
     window.deleteHabitWithModal = deleteHabitWithModal;
@@ -1305,12 +1478,29 @@
     window.clearHistoryWithModal = clearHistoryWithModal;
     window.copySyncId = copySyncId;
 
-    window.openEditBalanceModal = () => document.getElementById('edit-balance-modal').classList.remove('hidden');
+    // Modales precargados con datos vigentes del State para solucionar el Bug del Guardado
+    window.openEditBalanceModal = () => {
+      document.getElementById('balance-input').value = state.balance;
+      document.getElementById('edit-balance-modal').classList.remove('hidden');
+    };
     window.closeEditBalanceModal = () => document.getElementById('edit-balance-modal').classList.add('hidden');
-    window.openEditGoalModal = () => document.getElementById('edit-goal-modal').classList.remove('hidden');
+
+    window.openEditGoalModal = () => {
+      document.getElementById('goal-name-input').value = state.goalName;
+      document.getElementById('goal-cost-input').value = state.goalCost;
+      document.getElementById('edit-goal-modal').classList.remove('hidden');
+    };
     window.closeEditGoalModal = () => document.getElementById('edit-goal-modal').classList.add('hidden');
+    
     window.openAddHabitModal = () => document.getElementById('add-habit-modal').classList.remove('hidden');
     window.closeAddHabitModal = () => document.getElementById('add-habit-modal').classList.add('hidden');
+
+    // Manejo del modal de vinculación manual de ID
+    window.openSyncIdModal = () => {
+      document.getElementById('manual-sync-id-input').value = "";
+      document.getElementById('sync-id-modal').classList.remove('hidden');
+    };
+    window.closeSyncIdModal = () => document.getElementById('sync-id-modal').classList.add('hidden');
 
     // Métodos de simulación vinculados
     window.setSimulatedTime = (hour, minute) => {
@@ -1348,7 +1538,6 @@
       showToast("Tiempo Real", "Has restablecido el horario real de tu computadora.", "success");
     };
 
-    // Buscador y maquetador de calendarios
     window.navigateMonth = (dir) => {
       state.calendarMonth += dir;
       if (state.calendarMonth < 0) {
@@ -1386,12 +1575,34 @@
       }
     }
 
+    // Actualiza el nivel y progreso de XP del jugador basados en sus estadísticas
+    function updatePlayerLevelUI() {
+      let totalXP = 0;
+      Object.keys(state.history).forEach(date => {
+        const record = state.history[date];
+        if (record && record.completedCount) {
+          totalXP += record.completedCount * 10;
+        }
+      });
+
+      const todayDone = state.habits.filter(h => h.done).length;
+      totalXP += todayDone * 10;
+
+      const level = Math.floor(totalXP / 100) + 1;
+      const xpInCurrentLevel = totalXP % 100;
+
+      document.getElementById('player-level').innerText = `Lvl ${level}`;
+      document.getElementById('player-xp-display').innerText = `${xpInCurrentLevel} / 100 XP`;
+      document.getElementById('player-xp-bar').style.width = `${xpInCurrentLevel}%`;
+    }
+
     function updateExpensesTotalUI() {
       const todayStr = formatDateString(getNow());
       const record = getHistoryDayRecord(todayStr);
       document.getElementById('today-total-spent').innerText = `$${record.totalSpent.toFixed(2)}`;
     }
 
+    // Actualizar Rastreador de Metas de Compra
     function updateGoalTrackerUI() {
       const nameEl = document.getElementById('goal-display-name');
       const costEl = document.getElementById('goal-display-cost');
@@ -1412,7 +1623,7 @@
       const remaining = state.goalCost - state.balance;
       if (remaining <= 0) {
         remainingEl.innerText = "¡Meta alcanzada!";
-        predictedDateEl.innerHTML = `<span class="text-emerald-400">🎉 ¡Ya puedes comprar tu ${state.goalName}!</span>`;
+        predictedDateEl.innerHTML = `<span class="text-emerald-400 font-extrabold">🎉 ¡Ya puedes comprar tu ${state.goalName}!</span>`;
       } else {
         remainingEl.innerText = `Faltan ${remaining.toLocaleString()} Ⓟ`;
 
@@ -1632,11 +1843,11 @@
         const gain = ctx.createGain();
         const now = ctx.currentTime;
 
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(600, now);
-        osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
 
-        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.setValueAtTime(0.08, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
 
         osc.connect(gain).connect(ctx.destination);
@@ -1652,7 +1863,7 @@
         const gain = ctx.createGain();
         const now = ctx.currentTime;
 
-        osc.type = 'triangle';
+        osc.type = 'sine';
         osc.frequency.setValueAtTime(523.25, now);     
         osc.frequency.setValueAtTime(659.25, now + 0.08); 
         osc.frequency.setValueAtTime(783.99, now + 0.16); 
@@ -1667,7 +1878,7 @@
       } catch (e) {}
     }
 
-    // CELEBRACIÓN DE CONFETI
+    // CELEBRACIÓN DE CONFETI EN CANVAS
     function triggerCelebration() {
       const canvas = document.getElementById('confetti-canvas');
       const ctx = canvas.getContext('2d');
@@ -1849,11 +2060,13 @@
       return new Date();
     }
 
-    // Ciclo automático para que el reloj y el contador de tiempo real descuenten segundo a segundo
+    // Ciclo automático activo para refrescar el reloj y el contador de tiempo real segundo a segundo
     setInterval(updateClockAndUI, 1000);
 
-    // Inicialización de arranque inmediato al cargar la pantalla
+    // Inicialización del arranque inmediato al cargar la pantalla
     window.onload = function() {
+      // Ajuste de fecha de selección inicial de proyección
+      state.selectedProjectionDate = formatDateString(getNow());
       updateClockAndUI();
     };
   </script>
