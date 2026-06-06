@@ -8,113 +8,97 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f1f5f9; min-height: 100vh; }
-        .glass-card { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; min-height: 100vh; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .vbuck-color { color: #38bdf8; }
-        .vbuck-bg { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); }
+        .vbuck-bg { background-color: #0284c7; }
         .habit-checkbox:checked + div { background-color: #0284c7; border-color: #0284c7; }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <!-- Login Overlay -->
-    <div id="login-overlay" class="fixed inset-0 bg-slate-950 flex items-center justify-center z-[500] hidden">
-        <div class="glass-card p-8 rounded-3xl max-w-sm w-full mx-4 shadow-2xl border border-slate-800 text-center">
-            <div class="w-16 h-16 vbuck-bg rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-sky-500/20">
-                <i data-lucide="gem" class="w-8 h-8 text-white"></i>
-            </div>
-            <h2 class="text-2xl font-bold mb-6">PavoQuest</h2>
-            <div class="space-y-4 mb-6">
-                <input type="email" id="login-email" placeholder="Correo" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 focus:border-sky-500 outline-none transition">
-                <input type="password" id="login-password" placeholder="Contraseña" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 focus:border-sky-500 outline-none transition">
-            </div>
-            <div id="login-error" class="text-red-400 text-sm mb-4 hidden"></div>
-            <button onclick="window.handleLogin()" class="w-full vbuck-bg text-white py-3 rounded-xl font-bold mb-2 transition hover:opacity-90">Iniciar Sesión</button>
-            <button onclick="window.handleRegister()" class="w-full bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-xl font-bold transition">Crear Cuenta</button>
+    <div id="login-overlay" class="fixed inset-0 bg-slate-950 flex items-center justify-center z-[200] hidden">
+        <div class="bg-slate-800 p-8 rounded-3xl max-w-sm w-full border border-slate-700 shadow-2xl text-center">
+            <h2 class="text-2xl font-bold mb-6">Iniciar Sesión</h2>
+            <input type="email" id="login-email" placeholder="Correo" class="w-full bg-slate-900 p-3 mb-3 rounded-xl border border-slate-700 outline-none focus:border-sky-500">
+            <input type="password" id="login-password" placeholder="Contraseña" class="w-full bg-slate-900 p-3 mb-6 rounded-xl border border-slate-700 outline-none focus:border-sky-500">
+            <button onclick="window.handleLogin()" class="w-full vbuck-bg py-3 rounded-xl font-bold mb-2">Entrar</button>
+            <button onclick="window.handleRegister()" class="w-full bg-slate-700 py-3 rounded-xl font-bold">Crear Cuenta</button>
         </div>
     </div>
 
     <div id="app-container" class="max-w-7xl mx-auto hidden">
-        <header class="flex items-center justify-between mb-8">
+        <header class="flex items-center justify-between mb-8 pb-4 border-b border-slate-700">
             <h1 class="text-3xl font-extrabold">Pavo<span class="vbuck-color">Quest</span></h1>
-            <button onclick="window.logout()" class="text-sm bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg hover:border-red-900 transition flex items-center gap-2">
-                <i data-lucide="log-out" class="w-4 h-4"></i> Salir
-            </button>
+            <button onclick="window.logout()" class="bg-slate-800 px-4 py-2 rounded-lg text-sm">Salir</button>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Left -->
-            <div class="lg:col-span-4 flex flex-col gap-6">
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                <!-- Balance Inline Edit -->
                 <div class="glass-card rounded-3xl p-6">
-                    <h2 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Mis Pavos</h2>
+                    <h2 class="text-sm font-bold text-slate-400 uppercase mb-4">Mis Pavos</h2>
                     <div id="balance-view" class="flex items-center gap-4">
-                        <span id="current-balance" class="text-5xl font-black vbuck-color tracking-tight">0</span>
-                        <button onclick="window.toggleEdit(true)" class="p-2 hover:bg-slate-800 rounded-lg transition"><i data-lucide="pencil" class="w-5 h-5 text-slate-400"></i></button>
+                        <span id="current-balance" class="text-5xl font-black vbuck-color">0</span>
+                        <button onclick="window.toggleEdit(true)" class="p-2 hover:bg-slate-700 rounded-lg"><i data-lucide="pencil" class="w-5 h-5"></i></button>
                     </div>
                     <div id="balance-edit" class="hidden flex gap-2">
-                        <input type="number" id="input-edit-balance" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-2xl font-bold outline-none border-sky-500">
-                        <button onclick="window.saveBalance()" class="vbuck-bg px-4 rounded-lg font-bold">OK</button>
+                        <input type="number" id="input-edit-balance" class="w-full bg-slate-900 p-3 rounded-xl border border-slate-700">
+                        <button onclick="window.saveBalance()" class="vbuck-bg px-4 rounded-xl font-bold">OK</button>
                     </div>
-                    <button onclick="window.add100()" class="mt-6 w-full bg-slate-800 hover:bg-slate-700 py-3 rounded-xl text-sm font-bold border border-slate-700 transition">+ Reclamé 100</button>
+                    <button onclick="window.add100()" class="mt-6 w-full bg-slate-800 py-3 rounded-xl font-bold border border-slate-700 hover:bg-slate-700">+ Reclamé 100</button>
                 </div>
                 
-                <div class="glass-card rounded-3xl p-6 text-center">
-                    <h2 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Recompensa diaria</h2>
+                <div class="glass-card rounded-3xl p-6 text-center border-t-4 border-t-sky-500">
+                    <h2 class="text-xs font-bold text-slate-500 uppercase mb-2">Faltan para los 100 diarios</h2>
                     <div id="timer" class="text-3xl font-mono font-bold vbuck-color">00:00:00</div>
                 </div>
 
                 <div class="glass-card rounded-3xl p-6 flex-1">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Hábitos</h2>
+                        <h2 class="font-bold">Hábitos</h2>
                         <button onclick="document.getElementById('modal-add-habit').classList.remove('hidden')" class="text-sky-400 text-sm font-bold">+ Nuevo</button>
                     </div>
                     <div id="habits-list" class="space-y-3"></div>
                 </div>
             </div>
 
-            <!-- Right -->
-            <div class="lg:col-span-8 flex flex-col gap-6">
+            <div class="lg:col-span-7 flex flex-col gap-6">
                 <div class="glass-card rounded-3xl p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="font-bold text-lg" id="calendar-month-year">Mes Año</h2>
+                        <h2 id="calendar-month-year" class="font-bold text-lg">Mes Año</h2>
                         <div class="flex gap-2">
-                            <button onclick="window.changeMonth(-1)" class="p-2 bg-slate-800 rounded-lg hover:bg-slate-700 transition"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
-                            <button onclick="window.changeMonth(1)" class="p-2 bg-slate-800 rounded-lg hover:bg-slate-700 transition"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+                            <button onclick="window.changeMonth(-1)" class="p-2 bg-slate-800 rounded-lg"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+                            <button onclick="window.changeMonth(1)" class="p-2 bg-slate-800 rounded-lg"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
                         </div>
-                    </div>
-                    <div class="grid grid-cols-7 gap-2 text-center text-[10px] uppercase font-bold text-slate-600 mb-2">
-                        <div>Dom</div><div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div>
                     </div>
                     <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
                 </div>
                 
                 <div class="glass-card rounded-3xl p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-lg font-bold">Mis Metas</h2>
-                        <button onclick="document.getElementById('modal-add-goal').classList.remove('hidden')" class="text-sky-400 text-sm font-bold">+ Nueva Meta</button>
-                    </div>
+                    <h2 class="font-bold text-lg mb-4">Mis Metas</h2>
                     <div id="goals-list" class="space-y-4"></div>
+                    <button onclick="document.getElementById('modal-add-goal').classList.remove('hidden')" class="mt-4 w-full border border-dashed border-slate-700 py-3 rounded-xl text-slate-500 text-sm font-bold">+ Agregar Nueva Meta</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Modals -->
-    <div id="modal-add-habit" class="fixed inset-0 bg-slate-950/80 flex items-center justify-center z-[600] hidden">
+    <div id="modal-add-habit" class="fixed inset-0 bg-slate-950/80 flex items-center justify-center hidden z-[300]">
         <div class="bg-slate-900 p-6 rounded-3xl w-80 border border-slate-700">
             <h3 class="mb-4 font-bold">Nuevo Hábito</h3>
-            <input type="text" id="input-habit-name" placeholder="Nombre" class="w-full bg-slate-950 p-3 mb-3 rounded-xl border border-slate-700 outline-none focus:border-sky-500">
-            <input type="text" id="input-habit-emoji" placeholder="Emoji (ej: 🪥)" class="w-full bg-slate-950 p-3 mb-6 rounded-xl border border-slate-700 outline-none focus:border-sky-500">
+            <input type="text" id="input-habit-name" placeholder="Nombre" class="w-full bg-slate-950 p-3 mb-3 rounded-xl border border-slate-700">
+            <input type="text" id="input-habit-emoji" placeholder="Emoji (ej: 🪥)" class="w-full bg-slate-950 p-3 mb-6 rounded-xl border border-slate-700">
             <button onclick="window.saveNewHabit()" class="w-full vbuck-bg py-3 rounded-xl font-bold">Guardar</button>
         </div>
     </div>
 
-    <div id="modal-add-goal" class="fixed inset-0 bg-slate-950/80 flex items-center justify-center z-[600] hidden">
+    <div id="modal-add-goal" class="fixed inset-0 bg-slate-950/80 flex items-center justify-center hidden z-[300]">
         <div class="bg-slate-900 p-6 rounded-3xl w-80 border border-slate-700">
             <h3 class="mb-4 font-bold">Nueva Meta</h3>
-            <input type="text" id="input-goal-name" placeholder="Nombre" class="w-full bg-slate-900 p-3 mb-3 rounded-xl border border-slate-700 outline-none focus:border-sky-500">
-            <input type="number" id="input-goal-amount" placeholder="Pavos necesarios" class="w-full bg-slate-900 p-3 mb-6 rounded-xl border border-slate-700 outline-none focus:border-sky-500">
+            <input type="text" id="input-goal-name" placeholder="Nombre" class="w-full bg-slate-950 p-3 mb-3 rounded-xl border border-slate-700">
+            <input type="number" id="input-goal-amount" placeholder="Pavos necesarios" class="w-full bg-slate-950 p-3 mb-6 rounded-xl border border-slate-700">
             <button onclick="window.saveNewGoal()" class="w-full vbuck-bg py-3 rounded-xl font-bold">Guardar</button>
         </div>
     </div>
@@ -157,15 +141,20 @@
             if(currentUserId) await setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'profile', 'data'), { balance: currentBalance + 100 }, { merge: true });
         };
 
+        window.claimGoal = async (id, amount) => {
+            if(currentUserId && currentBalance >= amount) {
+                await setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'profile', 'data'), { balance: currentBalance - amount }, { merge: true });
+                await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'goals', id));
+            }
+        };
+
         window.handleLogin = async () => {
-            try {
-                await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value);
-            } catch(e) { document.getElementById('login-error').textContent = e.message; document.getElementById('login-error').classList.remove('hidden'); }
+            try { await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value); }
+            catch(e) { alert(e.message); }
         };
         window.handleRegister = async () => {
-            try {
-                await createUserWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value);
-            } catch(e) { document.getElementById('login-error').textContent = e.message; document.getElementById('login-error').classList.remove('hidden'); }
+            try { await createUserWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value); }
+            catch(e) { alert(e.message); }
         };
         window.logout = () => signOut(auth);
 
@@ -232,8 +221,14 @@
         window.renderGoals = () => {
             document.getElementById('goals-list').innerHTML = goalsData.map(g => `
                 <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex justify-between items-center">
-                    <span class="font-bold">${g.name}</span>
-                    <span class="text-sky-400 font-black">${Math.round((currentBalance/g.targetAmount)*100)}%</span>
+                    <div>
+                        <div class="font-bold">${g.name}</div>
+                        <div class="text-xs text-slate-500">${g.targetAmount} Pavos</div>
+                    </div>
+                    ${currentBalance >= g.targetAmount 
+                        ? `<button onclick="window.claimGoal('${g.id}', ${g.targetAmount})" class="bg-green-600 hover:bg-green-500 px-4 py-2 rounded-xl text-xs font-bold text-white transition">Reclamar</button>`
+                        : `<span class="text-sky-400 font-black">${Math.min(100, Math.round((currentBalance/g.targetAmount)*100))}%</span>`
+                    }
                 </div>
             `).join('');
         };
@@ -251,16 +246,21 @@
             const grid = document.getElementById('calendar-grid');
             grid.innerHTML = '';
             
+            const today = new Date();
             const firstDay = new Date(year, month, 1).getDay();
-            const days = new Date(year, month + 1, 0).getDate();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
 
             for(let i=0; i<firstDay; i++) grid.innerHTML += `<div></div>`;
             
-            for(let i=1; i<=days; i++) {
+            for(let i=1; i<=daysInMonth; i++) {
+                const isFuture = new Date(year, month, i) > today;
+                const daysFromToday = i - today.getDate();
+                const projected = isFuture ? currentBalance + (daysFromToday * 100) : currentBalance;
+                
                 grid.innerHTML += `
-                    <div class="bg-slate-900 p-2 rounded-xl border border-slate-800 min-h-[70px] text-left hover:border-sky-500 transition">
+                    <div class="bg-slate-900 p-2 rounded-xl border ${i === today.getDate() ? 'border-sky-500' : 'border-slate-800'} min-h-[70px] text-left">
                         <span class="text-[10px] text-slate-500 font-bold">${i}</span>
-                        <div class="text-sky-400 font-black text-xs mt-1">${(currentBalance + (i*100)).toLocaleString()}</div>
+                        ${isFuture ? `<div class="text-sky-400 font-black text-xs mt-1">${projected.toLocaleString()}</div>` : ''}
                     </div>`;
             }
             lucide.createIcons();
