@@ -17,14 +17,13 @@
 </head>
 <body class="p-4 md:p-8 relative">
 
-    <!-- Login Overlay -->
     <div id="login-overlay" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-[200] hidden">
         <div class="bg-slate-800 p-8 rounded-3xl max-w-md w-full mx-4 border border-slate-700 shadow-2xl text-center">
             <i data-lucide="gem" class="w-16 h-16 vbuck-color mx-auto mb-4"></i>
             <h2 class="text-3xl font-extrabold tracking-tight mb-2 text-white">Pavo<span class="vbuck-color">Quest</span></h2>
             <div class="space-y-4 mb-6 text-left">
-                <input type="email" id="login-email" placeholder="Correo" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white focus:border-sky-500">
-                <input type="password" id="login-password" placeholder="Contraseña" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white focus:border-sky-500">
+                <input type="email" id="login-email" placeholder="Correo" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white">
+                <input type="password" id="login-password" placeholder="Contraseña" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white">
             </div>
             <div id="login-error" class="bg-red-900/50 text-red-200 text-sm p-3 rounded-lg mb-4 hidden"></div>
             <div class="flex flex-col gap-3">
@@ -55,9 +54,15 @@
                     <button onclick="window.add100Vbucks()" class="mt-6 w-full bg-slate-800 py-3 rounded-lg font-bold border border-slate-700">+ Reclamé 100</button>
                 </div>
 
+                <!-- Timer Mejorado -->
                 <div class="glass-card rounded-2xl p-6 text-center border-t-4 border-t-sky-500">
-                    <h2 class="text-xs font-bold text-slate-400 mb-2">Recompensa en:</h2>
-                    <div id="timer" class="text-2xl font-mono font-bold text-sky-400">00:00:00</div>
+                    <h2 class="text-xs font-bold text-slate-400 mb-4 uppercase tracking-wider">Recompensa Diaria</h2>
+                    <div id="timer" class="flex justify-center gap-2">
+                        <div class="flex flex-col items-center"><span id="timer-days" class="text-2xl font-black bg-slate-900 px-3 py-1 rounded-lg border border-slate-700">00</span><span class="text-[10px] text-slate-500 mt-1">DÍAS</span></div>
+                        <div class="flex flex-col items-center"><span id="timer-hours" class="text-2xl font-black bg-slate-900 px-3 py-1 rounded-lg border border-slate-700">00</span><span class="text-[10px] text-slate-500 mt-1">HRS</span></div>
+                        <div class="flex flex-col items-center"><span id="timer-mins" class="text-2xl font-black bg-slate-900 px-3 py-1 rounded-lg border border-slate-700">00</span><span class="text-[10px] text-slate-500 mt-1">MIN</span></div>
+                        <div class="flex flex-col items-center"><span id="timer-secs" class="text-2xl font-black bg-slate-900 px-3 py-1 rounded-lg border border-slate-700">00</span><span class="text-[10px] text-slate-500 mt-1">SEG</span></div>
+                    </div>
                 </div>
 
                 <div class="glass-card rounded-2xl p-6">
@@ -94,6 +99,10 @@
         </div>
     </div>
 
+    <div id="modal-add-habit" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden p-4"><div class="bg-slate-800 p-6 rounded-2xl w-full max-w-sm"><input type="text" id="input-habit-name" placeholder="Hábito" class="w-full bg-slate-900 p-3 rounded-lg mb-2"><input type="text" id="input-habit-emoji" placeholder="Emoji" class="w-full bg-slate-900 p-3 rounded-lg mb-4"><div class="flex justify-end gap-2"><button onclick="window.closeModal('modal-add-habit')" class="px-4 py-2 text-slate-300">Cancelar</button><button onclick="window.saveNewHabit()" class="vbuck-bg px-4 py-2 rounded-lg font-bold">Guardar</button></div></div></div>
+    <div id="modal-add-goal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden p-4"><div class="bg-slate-800 p-6 rounded-2xl w-full max-w-sm"><input type="text" id="input-goal-name" placeholder="Meta" class="w-full bg-slate-900 p-3 rounded-lg mb-2"><input type="number" id="input-goal-amount" placeholder="Costo" class="w-full bg-slate-900 p-3 rounded-lg mb-4"><div class="flex justify-end gap-2"><button onclick="window.closeModal('modal-add-goal')" class="px-4 py-2 text-slate-300">Cancelar</button><button onclick="window.saveNewGoal()" class="vbuck-bg px-4 py-2 rounded-lg font-bold">Guardar</button></div></div></div>
+    <div id="modal-add-store" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden p-4"><div class="bg-slate-800 p-6 rounded-2xl w-full max-w-sm"><input type="text" id="input-store-name" placeholder="Nombre Objeto" class="w-full bg-slate-900 p-3 rounded-lg mb-2"><input type="date" id="input-store-date" class="w-full bg-slate-900 p-3 rounded-lg mb-4"><div class="flex justify-end gap-2"><button onclick="window.closeModal('modal-add-store')" class="px-4 py-2 text-slate-300">Cancelar</button><button onclick="window.saveNewStore()" class="vbuck-bg px-4 py-2 rounded-lg font-bold">Guardar</button></div></div></div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -112,25 +121,30 @@
                 currentUserId = user.uid;
                 document.getElementById('app-container').classList.remove('hidden');
                 document.getElementById('login-overlay').classList.add('hidden');
+                
                 onSnapshot(doc(db, 'artifacts', appId, 'users', currentUserId, 'profile', 'data'), (snap) => {
                     currentBalance = snap.exists() ? snap.data().balance : 0;
                     document.getElementById('current-balance').textContent = currentBalance.toLocaleString();
                     setDoc(doc(db, 'artifacts', appId, 'public_profiles', currentUserId), { email: user.email, balance: currentBalance }, { merge: true });
-                    renderCalendar();
+                    renderCalendar(); 
                     renderGoals();
                 });
+
                 onSnapshot(collection(db, 'artifacts', appId, 'users', currentUserId, 'goals'), (snap) => {
                     goalsData = []; snap.forEach(d => goalsData.push({id: d.id, ...d.data()}));
                     renderGoals();
                 });
+
                 onSnapshot(collection(db, 'artifacts', appId, 'users', currentUserId, 'storeItems'), (snap) => {
                     storeData = []; snap.forEach(d => storeData.push({id: d.id, ...d.data()}));
                     renderStore();
                 });
+
                 onSnapshot(doc(db, 'artifacts', appId, 'users', currentUserId, 'habits', 'data'), (snap) => {
                     habitsData = snap.exists() ? (snap.data().list || []) : [];
                     renderHabits();
                 });
+
                 onSnapshot(collection(db, 'artifacts', appId, 'public_profiles'), (snap) => {
                     const list = document.getElementById('friends-list'); list.innerHTML = '';
                     const ps = []; snap.forEach(d => ps.push({id: d.id, ...d.data()}));
@@ -142,47 +156,115 @@
                     lucide.createIcons();
                 });
             } else {
-                document.getElementById('app-container').classList.add('hidden');
-                document.getElementById('login-overlay').classList.remove('hidden');
+                 document.getElementById('app-container').classList.add('hidden');
+                 document.getElementById('login-overlay').classList.remove('hidden');
             }
         });
 
-        window.editBalanceMode = (show) => { document.getElementById('balance-display').classList.toggle('hidden', show); document.getElementById('balance-edit-form').classList.toggle('hidden', !show); };
+        window.handleLogin = async () => {
+            const errEl = document.getElementById('login-error');
+            try {
+                await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value);
+                errEl.classList.add('hidden');
+            } catch (error) {
+                errEl.textContent = "Error al iniciar sesión: " + error.message;
+                errEl.classList.remove('hidden');
+            }
+        };
+
+        window.handleRegister = async () => {
+            const errEl = document.getElementById('login-error');
+            try {
+                await createUserWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value);
+                 errEl.classList.add('hidden');
+            } catch (error) {
+                errEl.textContent = "Error al registrar: " + error.message;
+                errEl.classList.remove('hidden');
+            }
+        };
+
+        window.logout = () => signOut(auth);
+
+        window.editBalanceMode = (show) => { document.getElementById('balance-display').classList.toggle('hidden', show); document.getElementById('balance-edit-form').classList.toggle('hidden', !show); if(show) document.getElementById('input-balance').value = currentBalance; };
         window.saveBalance = async () => { await setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'profile', 'data'), { balance: parseInt(document.getElementById('input-balance').value) }, { merge: true }); window.editBalanceMode(false); };
         window.add100Vbucks = () => setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'profile', 'data'), { balance: currentBalance + 100 }, { merge: true });
+        
         window.saveNewGoal = async () => { const name = document.getElementById('input-goal-name').value; const amount = parseInt(document.getElementById('input-goal-amount').value); if(name && amount) { await addDoc(collection(db, 'artifacts', appId, 'users', currentUserId, 'goals'), { name, targetAmount: amount }); window.closeModal('modal-add-goal'); } };
         window.claimGoal = async (id, amount) => { if(currentBalance >= amount) { await setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'profile', 'data'), { balance: currentBalance - amount }, { merge: true }); await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'goals', id)); } };
         
         window.renderGoals = () => { 
-            document.getElementById('goals-list').innerHTML = goalsData.map(g => {
+            document.getElementById('goals-list').innerHTML = goalsData.map(g => { 
                 const progress = Math.min(100, Math.floor((currentBalance / g.targetAmount) * 100));
-                const missing = Math.max(0, g.targetAmount - currentBalance);
                 const canClaim = currentBalance >= g.targetAmount;
-                return `
-                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                        <div class="flex justify-between items-center mb-2"><span class="font-bold text-sm">${g.name}</span><span class="text-xs vbuck-color font-bold">${g.targetAmount}</span></div>
-                        <div class="w-full bg-slate-900 rounded-full h-2 mb-2"><div class="vbuck-bg h-2 rounded-full transition-all" style="width: ${progress}%"></div></div>
-                        <div class="flex justify-between text-xs text-slate-400 mb-3"><span>${progress}% completado</span><span>${missing > 0 ? 'Faltan ' + missing : '¡Listo!'}</span></div>
-                        <button onclick="window.claimGoal('${g.id}', ${g.targetAmount})" ${canClaim ? '' : 'disabled'} class="w-full ${canClaim ? 'vbuck-bg' : 'bg-slate-700 opacity-50'} py-2 rounded-lg text-xs font-bold transition">Reclamar</button>
-                    </div>`;
-            }).join('');
+                return `<div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                    <div class="flex justify-between mb-2 text-sm font-bold"><span>${g.name}</span><span class="vbuck-color">${progress}% (${g.targetAmount})</span></div>
+                    <div class="w-full bg-slate-900 rounded-full h-2 mb-3"><div class="vbuck-bg h-2 rounded-full transition-all duration-500" style="width: ${progress}%"></div></div>
+                    <button onclick="window.claimGoal('${g.id}', ${g.targetAmount})" class="w-full ${canClaim ? 'vbuck-bg hover:bg-sky-600' : 'bg-slate-700 cursor-not-allowed opacity-50'} py-2 rounded-lg text-xs font-bold transition" ${canClaim ? '' : 'disabled'}>Reclamar</button>
+                </div>` 
+            }).join(''); 
         };
-        
+
         window.renderHabits = () => { const today = new Date().toISOString().split('T')[0]; document.getElementById('habits-list').innerHTML = habitsData.map(h => `<div class="flex items-center gap-2 text-sm bg-slate-800 p-2 rounded"><input type="checkbox" onchange="window.toggleHabit('${h.id}', this.checked)" ${h.log?.[today] ? 'checked' : ''}><span>${h.emoji} ${h.name}</span></div>`).join(''); };
         window.toggleHabit = async (id, checked) => { const today = new Date().toISOString().split('T')[0]; const newList = habitsData.map(h => h.id === id ? {...h, log: {...h.log, [today]: checked}} : h); await setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'habits', 'data'), { list: newList }); };
         window.saveNewHabit = async () => { const name = document.getElementById('input-habit-name').value; const emoji = document.getElementById('input-habit-emoji').value; if(name) { const newList = [...habitsData, {id: Date.now().toString(), name, emoji, log: {}}]; await setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'habits', 'data'), { list: newList }); window.closeModal('modal-add-habit'); } };
         
-        window.renderCalendar = () => { const grid = document.getElementById('calendar-grid'); grid.innerHTML = ''; const days = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0).getDate(); for(let i = 1; i <= days; i++) { const d = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), i); const today = new Date(); today.setHours(0,0,0,0); const diff = d >= today ? Math.max(0, (d - today) / 86400000) : 0; grid.innerHTML += `<div class="p-2 bg-slate-800 rounded text-[10px] ${d.getTime() === today.getTime() ? 'border border-sky-500' : ''}">${i}<br><span class="vbuck-color">${currentBalance + (diff * 100)}</span></div>`; } };
+        window.saveNewStore = async () => { const name = document.getElementById('input-store-name').value; const date = document.getElementById('input-store-date').value; if(name && date) { await addDoc(collection(db, 'artifacts', appId, 'users', currentUserId, 'storeItems'), { name, endDate: date }); window.closeModal('modal-add-store'); } };
+        window.renderStore = () => { document.getElementById('store-list').innerHTML = storeData.map(s => `<div class="bg-slate-800 p-3 rounded-lg text-sm flex justify-between items-center"><span class="font-bold">${s.name}</span><span class="vbuck-color font-mono" data-end="${s.endDate}">...</span></div>`).join(''); };
+        
+        window.renderCalendar = () => { 
+            const grid = document.getElementById('calendar-grid'); grid.innerHTML = ''; 
+            const daysInMonth = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0).getDate(); 
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            document.getElementById('calendar-month-year').textContent = `${monthNames[currentCalendarDate.getMonth()]} ${currentCalendarDate.getFullYear()}`;
+            
+            // Add day headers
+            const dayNames = ['DOM', 'LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB'];
+            dayNames.forEach(d => { grid.innerHTML += `<div class="text-slate-500 font-bold mb-2">${d}</div>`; });
+            
+            const firstDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1).getDay();
+            for(let i=0; i<firstDay; i++) { grid.innerHTML += `<div></div>`; } // Empty padding
+            
+            for(let i = 1; i <= daysInMonth; i++) { 
+                const d = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), i); 
+                const today = new Date(); today.setHours(0,0,0,0); 
+                const diff = d >= today ? Math.max(0, (d - today) / 86400000) : 0; 
+                grid.innerHTML += `<div class="p-2 bg-slate-800 rounded text-[10px] ${d.getTime() === today.getTime() ? 'border border-sky-500 shadow-[0_0_10px_rgba(14,165,233,0.3)]' : ''}"><span class="${d.getTime() < today.getTime() ? 'text-slate-600' : 'text-slate-300'}">${i}</span><br><span class="vbuck-color font-bold ${d.getTime() < today.getTime() ? 'opacity-50' : ''}">${currentBalance + (diff * 100)}</span></div>`; 
+            } 
+        };
         window.changeMonth = (d) => { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + d); window.renderCalendar(); };
         window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
         window.openGoalModal = () => document.getElementById('modal-add-goal').classList.remove('hidden');
-        window.handleLogin = () => signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value);
-        window.handleRegister = () => createUserWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value);
-        window.logout = () => signOut(auth);
 
         setInterval(() => {
-            const now = new Date(); const target = new Date(now); target.setHours(19, 0, 0, 0); if(now > target) target.setDate(target.getDate() + 1);
-            document.getElementById('timer').textContent = new Date(target - now).toISOString().substr(11, 8);
+            const now = new Date(); 
+            
+            // Main Timer Logic
+            const target = new Date(now); target.setHours(19, 0, 0, 0); if(now > target) target.setDate(target.getDate() + 1);
+            const diffMain = target - now;
+            
+            document.getElementById('timer-days').textContent = String(Math.floor(diffMain / 86400000)).padStart(2, '0');
+            document.getElementById('timer-hours').textContent = String(Math.floor((diffMain % 86400000) / 3600000)).padStart(2, '0');
+            document.getElementById('timer-mins').textContent = String(Math.floor((diffMain % 3600000) / 60000)).padStart(2, '0');
+            document.getElementById('timer-secs').textContent = String(Math.floor((diffMain % 60000) / 1000)).padStart(2, '0');
+
+            // Store Logic
+            document.querySelectorAll('[data-end]').forEach(el => {
+                const dateStr = el.dataset.end;
+                const [year, month, day] = dateStr.split('-');
+                const end = new Date(year, month - 1, day, 18, 59, 0, 0);
+                
+                const diff = end - now;
+                if (diff > 0) {
+                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                    const m = Math.floor((diff / 1000 / 60) % 60);
+                    const s = Math.floor((diff / 1000) % 60);
+                    el.textContent = `${d}d ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                } else {
+                    el.textContent = "Finalizado";
+                    el.classList.replace('vbuck-color', 'text-red-400');
+                }
+            });
         }, 1000);
         lucide.createIcons();
     </script>
