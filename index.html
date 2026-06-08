@@ -7,101 +7,245 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,0.2) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,0.2) 0, transparent 50%); min-height: 100vh; }
-        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
-        .vbuck-color { color: #38bdf8; } .vbuck-bg { background-color: #0284c7; } .vbuck-bg:hover { background-color: #0369a1; }
-        .habit-checkbox:checked + div { background-color: #0284c7; border-color: #0284c7; }
-        .habit-checkbox:checked + div svg { opacity: 1; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&display=swap');
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #0f172a; 
+            color: #f8fafc; 
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,0.3) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,0.2) 0, transparent 50%); 
+            min-height: 100vh; 
+            background-attachment: fixed;
+        }
+
+        /* Efecto de cristal mejorado */
+        .glass-card { 
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8));
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1); 
+        }
+
+        .vbuck-color { color: #38bdf8; text-shadow: 0 0 20px rgba(56, 189, 248, 0.3); } 
+        .vbuck-bg { background: linear-gradient(135deg, #0ea5e9, #0284c7); box-shadow: 0 4px 15px -3px rgba(2, 132, 199, 0.4); } 
+        .vbuck-bg:hover { background: linear-gradient(135deg, #38bdf8, #0369a1); transform: translateY(-1px); box-shadow: 0 6px 20px -3px rgba(2, 132, 199, 0.6); }
+
+        /* Scrollbar estilizada */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.5); }
+
+        /* Botones modales suaves */
+        .modal-overlay { backdrop-filter: blur(8px); animation: fadeIn 0.2s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
-<body class="p-4 md:p-8 relative">
+<body class="p-4 md:p-8 relative selection:bg-sky-500/30">
 
-    <div id="login-overlay" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-[200] hidden">
-        <div class="bg-slate-800 p-8 rounded-3xl max-w-md w-full mx-4 border border-slate-700 shadow-2xl text-center">
-            <i data-lucide="gem" class="w-16 h-16 vbuck-color mx-auto mb-4"></i>
-            <h2 class="text-3xl font-extrabold tracking-tight mb-2 text-white">Pavo<span class="vbuck-color">Quest</span></h2>
-            <div class="space-y-4 mb-6 text-left">
-                <input type="email" id="login-email" placeholder="Correo" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white">
-                <input type="password" id="login-password" placeholder="Contraseña" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white">
+    <div id="login-overlay" class="fixed inset-0 bg-slate-900/90 flex items-center justify-center z-[200] hidden modal-overlay">
+        <div class="glass-card p-10 rounded-[2rem] max-w-md w-full mx-4 border border-slate-700/50 text-center relative overflow-hidden">
+            <!-- Brillo de fondo -->
+            <div class="absolute -top-24 -left-24 w-48 h-48 bg-sky-500/20 rounded-full blur-[60px] pointer-events-none"></div>
+            
+            <i data-lucide="gem" class="w-20 h-20 vbuck-color mx-auto mb-6 drop-shadow-2xl animate-bounce" style="animation-duration: 3s;"></i>
+            <h2 class="text-4xl font-black tracking-tighter mb-2 text-white">Pavo<span class="vbuck-color">Quest</span></h2>
+            <p class="text-slate-400 text-sm mb-8 font-medium">Tu progreso diario asegurado en la nube.</p>
+
+            <div class="space-y-4 mb-8 text-left relative z-10">
+                <div class="relative group">
+                    <i data-lucide="mail" class="absolute left-4 top-3.5 w-5 h-5 text-slate-500 group-focus-within:text-sky-400 transition-colors"></i>
+                    <input type="email" id="login-email" placeholder="Correo electrónico" class="w-full bg-slate-900/80 border border-slate-700 rounded-2xl pl-12 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all shadow-inner">
+                </div>
+                <div class="relative group">
+                    <i data-lucide="lock" class="absolute left-4 top-3.5 w-5 h-5 text-slate-500 group-focus-within:text-sky-400 transition-colors"></i>
+                    <input type="password" id="login-password" placeholder="Contraseña" class="w-full bg-slate-900/80 border border-slate-700 rounded-2xl pl-12 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all shadow-inner">
+                </div>
             </div>
-            <div id="login-error" class="bg-red-900/50 text-red-200 text-sm p-3 rounded-lg mb-4 hidden"></div>
-            <div class="flex flex-col gap-3">
-                <button onclick="window.handleLogin()" class="w-full vbuck-bg hover:bg-sky-700 text-white py-3 rounded-xl font-bold transition">Iniciar Sesión</button>
-                <button onclick="window.handleRegister()" class="w-full bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-bold transition">Crear Cuenta</button>
+            <div id="login-error" class="bg-red-500/10 border border-red-500/30 text-red-400 text-sm p-3 rounded-xl mb-6 hidden font-medium"></div>
+            
+            <div class="flex flex-col gap-3 relative z-10">
+                <button onclick="window.handleLogin()" class="w-full vbuck-bg text-white py-3.5 rounded-2xl font-bold transition-all text-lg tracking-wide">Acceder</button>
+                <div class="flex items-center gap-4 my-2 opacity-60">
+                    <div class="flex-1 h-px bg-gradient-to-r from-transparent to-slate-500"></div>
+                    <span class="text-xs uppercase tracking-widest font-bold text-slate-400">O NUEVO</span>
+                    <div class="flex-1 h-px bg-gradient-to-l from-transparent to-slate-500"></div>
+                </div>
+                <button onclick="window.handleRegister()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 text-white py-3.5 rounded-2xl font-bold transition-all shadow-lg">Crear Cuenta</button>
             </div>
         </div>
     </div>
 
-    <div id="app-container" class="max-w-7xl mx-auto hidden">
-        <header class="flex items-center justify-between mb-8 pb-4 border-b border-slate-700">
-            <div class="flex items-center gap-3"><i data-lucide="gem" class="w-8 h-8 vbuck-color"></i><h1 class="text-3xl font-extrabold">Pavo<span class="vbuck-color">Quest</span></h1></div>
-            <button onclick="window.logout()" class="text-slate-400 hover:text-red-400 text-sm">Salir</button>
+    <div id="app-container" class="max-w-7xl mx-auto hidden pb-12">
+        <header class="flex items-center justify-between mb-10 mt-4 pb-6 border-b border-slate-800/80">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-sky-500/10 rounded-xl border border-sky-500/20">
+                    <i data-lucide="gem" class="w-8 h-8 vbuck-color"></i>
+                </div>
+                <h1 class="text-3xl font-black tracking-tighter">Pavo<span class="vbuck-color">Quest</span></h1>
+            </div>
+            <button onclick="window.logout()" class="flex items-center gap-2 text-slate-400 hover:text-red-400 hover:bg-red-400/10 px-4 py-2 rounded-xl transition-all text-sm font-semibold">
+                <i data-lucide="log-out" class="w-4 h-4"></i> Salir
+            </button>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-4 flex flex-col gap-6">
-                <div class="glass-card rounded-2xl p-6">
-                    <h2 class="text-lg font-semibold mb-2 flex items-center gap-2"><i data-lucide="wallet" class="w-5 h-5"></i> Mis Pavos</h2>
-                    <div id="balance-display" class="flex items-end gap-2 mt-4">
-                        <span id="current-balance" class="text-5xl font-black vbuck-color">0</span>
-                        <button onclick="window.editBalanceMode(true)" class="p-2 hover:bg-slate-700 rounded-lg"><i data-lucide="pencil" class="w-5 h-5"></i></button>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Columna Izquierda -->
+            <div class="lg:col-span-4 flex flex-col gap-8">
+                
+                <div class="glass-card rounded-[2rem] p-8 relative overflow-hidden group">
+                    <div class="absolute -right-10 -top-10 opacity-5 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none">
+                        <i data-lucide="wallet" class="w-48 h-48"></i>
                     </div>
-                    <div id="balance-edit-form" class="mt-4 hidden flex gap-2">
-                        <input type="number" id="input-balance" class="bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 w-full">
-                        <button onclick="window.saveBalance()" class="vbuck-bg px-4 rounded-lg font-bold">OK</button>
+                    <h2 class="text-slate-400 font-bold uppercase tracking-wider text-xs mb-3 flex items-center gap-2"><i data-lucide="coins" class="w-4 h-4 text-sky-400"></i> Mi Billetera</h2>
+                    
+                    <div id="balance-display" class="flex items-center gap-4 mt-2">
+                        <span id="current-balance" class="text-6xl font-black vbuck-color tracking-tighter">0</span>
+                        <button onclick="window.editBalanceMode(true)" class="p-2.5 bg-slate-800/50 hover:bg-sky-500/20 border border-slate-700/50 hover:border-sky-500/50 rounded-xl text-slate-400 hover:text-sky-400 transition-all shadow-sm"><i data-lucide="pencil" class="w-5 h-5"></i></button>
                     </div>
-                    <button onclick="window.add100Vbucks()" class="mt-6 w-full bg-slate-800 py-3 rounded-lg font-bold border border-slate-700">+ Reclamé 100</button>
+                    
+                    <div id="balance-edit-form" class="mt-2 hidden flex gap-2">
+                        <input type="number" id="input-balance" class="bg-slate-900 border border-slate-600 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 rounded-xl px-4 py-3 w-full text-2xl font-bold shadow-inner outline-none transition-all">
+                        <button onclick="window.saveBalance()" class="vbuck-bg px-6 rounded-xl font-bold shadow-lg flex items-center justify-center text-white"><i data-lucide="check" class="w-6 h-6"></i></button>
+                    </div>
+                    
+                    <button onclick="window.add100Vbucks()" class="mt-8 w-full bg-slate-800/80 hover:bg-slate-700 border border-slate-700 hover:border-slate-500 py-4 rounded-xl font-bold text-slate-200 transition-all flex items-center justify-center gap-2 shadow-sm group-hover:shadow-md">
+                        <i data-lucide="plus-circle" class="w-5 h-5 text-sky-400"></i> Acabo de reclamar 100
+                    </button>
                 </div>
 
-                <!-- Timer Mejorado -->
-                <div class="glass-card rounded-2xl p-6 text-center border-t-4 border-t-sky-500">
-                    <h2 class="text-xs font-bold text-slate-400 mb-4 uppercase tracking-wider">Recompensa Diaria</h2>
-                    <div id="timer" class="flex justify-center gap-2">
-                        <div class="flex flex-col items-center"><span id="timer-days" class="text-2xl font-black bg-slate-900 px-3 py-1 rounded-lg border border-slate-700">00</span><span class="text-[10px] text-slate-500 mt-1">DÍAS</span></div>
-                        <div class="flex flex-col items-center"><span id="timer-hours" class="text-2xl font-black bg-slate-900 px-3 py-1 rounded-lg border border-slate-700">00</span><span class="text-[10px] text-slate-500 mt-1">HRS</span></div>
-                        <div class="flex flex-col items-center"><span id="timer-mins" class="text-2xl font-black bg-slate-900 px-3 py-1 rounded-lg border border-slate-700">00</span><span class="text-[10px] text-slate-500 mt-1">MIN</span></div>
-                        <div class="flex flex-col items-center"><span id="timer-secs" class="text-2xl font-black bg-slate-900 px-3 py-1 rounded-lg border border-slate-700">00</span><span class="text-[10px] text-slate-500 mt-1">SEG</span></div>
+                <div class="glass-card rounded-[2rem] p-6 text-center border border-sky-500/20 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-sky-500 to-transparent opacity-50"></div>
+                    <h2 class="text-xs font-bold text-slate-400 mb-5 uppercase tracking-widest flex items-center justify-center gap-2">
+                        <i data-lucide="timer" class="w-4 h-4 text-sky-400"></i> Próxima Recompensa
+                    </h2>
+                    
+                    <div id="timer" class="flex justify-center gap-3">
+                        <div class="flex flex-col items-center bg-slate-900/80 p-3 rounded-2xl border border-slate-800 shadow-inner w-[70px]">
+                            <span id="timer-days" class="text-2xl font-black text-white tracking-tighter">00</span>
+                            <span class="text-[9px] text-sky-400 font-bold mt-1">DÍAS</span>
+                        </div>
+                        <span class="text-slate-600 font-black text-2xl mt-3">:</span>
+                        <div class="flex flex-col items-center bg-slate-900/80 p-3 rounded-2xl border border-slate-800 shadow-inner w-[70px]">
+                            <span id="timer-hours" class="text-2xl font-black text-white tracking-tighter">00</span>
+                            <span class="text-[9px] text-sky-400 font-bold mt-1">HRS</span>
+                        </div>
+                        <span class="text-slate-600 font-black text-2xl mt-3">:</span>
+                        <div class="flex flex-col items-center bg-slate-900/80 p-3 rounded-2xl border border-slate-800 shadow-inner w-[70px]">
+                            <span id="timer-mins" class="text-2xl font-black text-white tracking-tighter">00</span>
+                            <span class="text-[9px] text-sky-400 font-bold mt-1">MIN</span>
+                        </div>
+                        <span class="text-slate-600 font-black text-2xl mt-3">:</span>
+                        <div class="flex flex-col items-center bg-slate-900/80 p-3 rounded-2xl border border-slate-800 shadow-inner w-[70px]">
+                            <span id="timer-secs" class="text-2xl font-black text-sky-400 tracking-tighter">00</span>
+                            <span class="text-[9px] text-sky-400 font-bold mt-1">SEG</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="glass-card rounded-2xl p-6">
-                    <div class="flex justify-between mb-4"><h2 class="font-bold">Hábitos</h2><button onclick="document.getElementById('modal-add-habit').classList.remove('hidden')" class="text-xs text-sky-400">+ Añadir</button></div>
-                    <div id="habits-list" class="space-y-3"></div>
+                <div class="glass-card rounded-[2rem] p-6 flex flex-col flex-1 max-h-[500px]">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="font-bold text-lg flex items-center gap-2"><i data-lucide="check-square" class="w-5 h-5 text-sky-400"></i> Hábitos</h2>
+                        <button onclick="document.getElementById('modal-add-habit').classList.remove('hidden')" class="bg-slate-800 hover:bg-slate-700 text-sky-400 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors border border-slate-700">
+                            + Añadir
+                        </button>
+                    </div>
+                    <div id="habits-list" class="space-y-3 overflow-y-auto pr-2 pb-2"></div>
                 </div>
             </div>
 
-            <div class="lg:col-span-8 flex flex-col gap-6">
-                <div class="glass-card rounded-2xl p-6">
-                    <div class="flex justify-between mb-6">
-                        <h2 id="calendar-month-year" class="font-bold text-lg">Mes</h2>
-                        <div class="flex gap-2"><button onclick="window.changeMonth(-1)" class="p-2 bg-slate-800 rounded-lg"><i data-lucide="chevron-left" class="w-4 h-4"></i></button><button onclick="window.changeMonth(1)" class="p-2 bg-slate-800 rounded-lg"><i data-lucide="chevron-right" class="w-4 h-4"></i></button></div>
+            <!-- Columna Derecha -->
+            <div class="lg:col-span-8 flex flex-col gap-8">
+                
+                <div class="glass-card rounded-[2rem] p-8">
+                    <div class="flex justify-between items-center mb-8">
+                        <h2 class="font-bold text-xl flex items-center gap-2"><i data-lucide="calendar-days" class="w-6 h-6 text-sky-400"></i> Proyección</h2>
+                        <div class="flex items-center gap-3 bg-slate-900/50 p-1.5 rounded-xl border border-slate-700/50 shadow-inner">
+                            <button onclick="window.changeMonth(-1)" class="p-2 hover:bg-slate-700 rounded-lg transition-colors text-slate-400 hover:text-white"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                            <span id="calendar-month-year" class="font-bold text-sm min-w-[120px] text-center uppercase tracking-widest text-sky-100">Mes</span>
+                            <button onclick="window.changeMonth(1)" class="p-2 hover:bg-slate-700 rounded-lg transition-colors text-slate-400 hover:text-white"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                        </div>
                     </div>
-                    <div id="calendar-grid" class="grid grid-cols-7 gap-2 text-center text-xs"></div>
+                    
+                    <div class="grid grid-cols-7 gap-3 mb-3">
+                        <div class="text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">DOM</div>
+                        <div class="text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">LUN</div>
+                        <div class="text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">MAR</div>
+                        <div class="text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">MIE</div>
+                        <div class="text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">JUE</div>
+                        <div class="text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">VIE</div>
+                        <div class="text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">SAB</div>
+                    </div>
+                    <div id="calendar-grid" class="grid grid-cols-7 gap-2 md:gap-3"></div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-card rounded-2xl p-6">
-                        <div class="flex justify-between mb-4"><h2 class="font-bold">Tienda</h2><button onclick="document.getElementById('modal-add-store').classList.remove('hidden')" class="text-xs text-sky-400">+ Objeto</button></div>
-                        <div id="store-list" class="space-y-3"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="glass-card rounded-[2rem] p-6 flex flex-col max-h-[400px]">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="font-bold text-lg flex items-center gap-2"><i data-lucide="shopping-cart" class="w-5 h-5 text-sky-400"></i> Tienda</h2>
+                            <button onclick="document.getElementById('modal-add-store').classList.remove('hidden')" class="bg-slate-800 hover:bg-slate-700 text-sky-400 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors border border-slate-700">+ Objeto</button>
+                        </div>
+                        <div id="store-list" class="space-y-3 overflow-y-auto pr-2 pb-2"></div>
                     </div>
-                    <div class="glass-card rounded-2xl p-6">
-                        <div class="flex justify-between mb-4"><h2 class="font-bold">Metas</h2><button onclick="window.openGoalModal()" class="text-xs text-sky-400">+ Nueva</button></div>
-                        <div id="goals-list" class="space-y-3"></div>
+                    
+                    <div class="glass-card rounded-[2rem] p-6 flex flex-col max-h-[400px]">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="font-bold text-lg flex items-center gap-2"><i data-lucide="target" class="w-5 h-5 text-sky-400"></i> Metas</h2>
+                            <button onclick="window.openGoalModal()" class="bg-slate-800 hover:bg-slate-700 text-sky-400 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors border border-slate-700">+ Nueva</button>
+                        </div>
+                        <div id="goals-list" class="space-y-4 overflow-y-auto pr-2 pb-2"></div>
                     </div>
                 </div>
 
-                <div class="glass-card rounded-2xl p-6">
-                    <h2 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="trophy" class="w-5 h-5 text-yellow-500"></i> Leaderboard</h2>
-                    <div id="friends-list" class="space-y-2"></div>
+                <div class="glass-card rounded-[2rem] p-6">
+                    <h2 class="font-bold text-lg mb-6 flex items-center gap-2"><i data-lucide="medal" class="w-5 h-5 text-yellow-400 drop-shadow-md"></i> Ranking de Amigos</h2>
+                    <div id="friends-list" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="modal-add-habit" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden p-4"><div class="bg-slate-800 p-6 rounded-2xl w-full max-w-sm"><input type="text" id="input-habit-name" placeholder="Hábito" class="w-full bg-slate-900 p-3 rounded-lg mb-2"><input type="text" id="input-habit-emoji" placeholder="Emoji" class="w-full bg-slate-900 p-3 rounded-lg mb-4"><div class="flex justify-end gap-2"><button onclick="window.closeModal('modal-add-habit')" class="px-4 py-2 text-slate-300">Cancelar</button><button onclick="window.saveNewHabit()" class="vbuck-bg px-4 py-2 rounded-lg font-bold">Guardar</button></div></div></div>
-    <div id="modal-add-goal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden p-4"><div class="bg-slate-800 p-6 rounded-2xl w-full max-w-sm"><input type="text" id="input-goal-name" placeholder="Meta" class="w-full bg-slate-900 p-3 rounded-lg mb-2"><input type="number" id="input-goal-amount" placeholder="Costo" class="w-full bg-slate-900 p-3 rounded-lg mb-4"><div class="flex justify-end gap-2"><button onclick="window.closeModal('modal-add-goal')" class="px-4 py-2 text-slate-300">Cancelar</button><button onclick="window.saveNewGoal()" class="vbuck-bg px-4 py-2 rounded-lg font-bold">Guardar</button></div></div></div>
-    <div id="modal-add-store" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden p-4"><div class="bg-slate-800 p-6 rounded-2xl w-full max-w-sm"><input type="text" id="input-store-name" placeholder="Nombre Objeto" class="w-full bg-slate-900 p-3 rounded-lg mb-2"><input type="date" id="input-store-date" class="w-full bg-slate-900 p-3 rounded-lg mb-4"><div class="flex justify-end gap-2"><button onclick="window.closeModal('modal-add-store')" class="px-4 py-2 text-slate-300">Cancelar</button><button onclick="window.saveNewStore()" class="vbuck-bg px-4 py-2 rounded-lg font-bold">Guardar</button></div></div></div>
+    <!-- Modales UI Premium -->
+    <div id="modal-add-habit" class="fixed inset-0 bg-slate-900/80 flex items-center justify-center z-[250] hidden modal-overlay p-4">
+        <div class="glass-card p-8 rounded-[2rem] w-full max-w-sm border border-slate-600 shadow-2xl">
+            <h3 class="text-xl font-bold mb-6 text-white flex items-center gap-2"><i data-lucide="check-square" class="w-5 h-5 text-sky-400"></i> Nuevo Hábito</h3>
+            <input type="text" id="input-habit-name" placeholder="Nombre (ej. Leer)" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-3.5 mb-4 text-white focus:outline-none focus:border-sky-500 shadow-inner">
+            <input type="text" id="input-habit-emoji" placeholder="Emoji (ej. 📚)" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-3.5 mb-8 text-white focus:outline-none focus:border-sky-500 shadow-inner text-xl">
+            <div class="flex justify-end gap-3">
+                <button onclick="window.closeModal('modal-add-habit')" class="px-5 py-2.5 text-sm font-bold text-slate-400 hover:text-white transition-colors">Cancelar</button>
+                <button onclick="window.saveNewHabit()" class="vbuck-bg px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg text-white">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-add-goal" class="fixed inset-0 bg-slate-900/80 flex items-center justify-center z-[250] hidden modal-overlay p-4">
+        <div class="glass-card p-8 rounded-[2rem] w-full max-w-sm border border-slate-600 shadow-2xl">
+            <h3 class="text-xl font-bold mb-6 text-white flex items-center gap-2"><i data-lucide="target" class="w-5 h-5 text-sky-400"></i> Nueva Meta</h3>
+            <input type="text" id="input-goal-name" placeholder="¿Qué quieres comprar?" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-3.5 mb-4 text-white focus:outline-none focus:border-sky-500 shadow-inner">
+            <input type="number" id="input-goal-amount" placeholder="Costo en pavos" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-3.5 mb-8 text-white focus:outline-none focus:border-sky-500 shadow-inner font-bold">
+            <div class="flex justify-end gap-3">
+                <button onclick="window.closeModal('modal-add-goal')" class="px-5 py-2.5 text-sm font-bold text-slate-400 hover:text-white transition-colors">Cancelar</button>
+                <button onclick="window.saveNewGoal()" class="vbuck-bg px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg text-white">Crear Meta</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-add-store" class="fixed inset-0 bg-slate-900/80 flex items-center justify-center z-[250] hidden modal-overlay p-4">
+        <div class="glass-card p-8 rounded-[2rem] w-full max-w-sm border border-slate-600 shadow-2xl">
+            <h3 class="text-xl font-bold mb-6 text-white flex items-center gap-2"><i data-lucide="shopping-cart" class="w-5 h-5 text-sky-400"></i> Seguir Objeto</h3>
+            <input type="text" id="input-store-name" placeholder="Nombre del cosmético" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-3.5 mb-4 text-white focus:outline-none focus:border-sky-500 shadow-inner">
+            <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Fecha que sale de la tienda</label>
+            <input type="date" id="input-store-date" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-3.5 mb-8 text-white focus:outline-none focus:border-sky-500 shadow-inner">
+            <div class="flex justify-end gap-3">
+                <button onclick="window.closeModal('modal-add-store')" class="px-5 py-2.5 text-sm font-bold text-slate-400 hover:text-white transition-colors">Cancelar</button>
+                <button onclick="window.saveNewStore()" class="vbuck-bg px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg text-white">Seguir</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -125,147 +269,158 @@
                 onSnapshot(doc(db, 'artifacts', appId, 'users', currentUserId, 'profile', 'data'), (snap) => {
                     currentBalance = snap.exists() ? snap.data().balance : 0;
                     document.getElementById('current-balance').textContent = currentBalance.toLocaleString();
+                    renderCalendar(); renderGoals();
                     setDoc(doc(db, 'artifacts', appId, 'public_profiles', currentUserId), { email: user.email, balance: currentBalance }, { merge: true });
-                    renderCalendar(); 
-                    renderGoals();
                 });
-
                 onSnapshot(collection(db, 'artifacts', appId, 'users', currentUserId, 'goals'), (snap) => {
                     goalsData = []; snap.forEach(d => goalsData.push({id: d.id, ...d.data()}));
                     renderGoals();
                 });
-
                 onSnapshot(collection(db, 'artifacts', appId, 'users', currentUserId, 'storeItems'), (snap) => {
                     storeData = []; snap.forEach(d => storeData.push({id: d.id, ...d.data()}));
                     renderStore();
                 });
-
                 onSnapshot(doc(db, 'artifacts', appId, 'users', currentUserId, 'habits', 'data'), (snap) => {
                     habitsData = snap.exists() ? (snap.data().list || []) : [];
                     renderHabits();
                 });
-
                 onSnapshot(collection(db, 'artifacts', appId, 'public_profiles'), (snap) => {
                     const list = document.getElementById('friends-list'); list.innerHTML = '';
-                    const ps = []; snap.forEach(d => ps.push({id: d.id, ...d.data()}));
-                    ps.sort((a,b) => b.balance - a.balance);
-                    ps.forEach((p, i) => {
-                        let color = i === 0 ? 'text-yellow-400' : i === 1 ? 'text-slate-300' : i === 2 ? 'text-amber-700' : 'text-slate-600';
-                        list.innerHTML += `<div class="flex justify-between bg-slate-800 p-3 rounded-lg"><div class="flex items-center gap-2"><i data-lucide="trophy" class="w-4 h-4 ${color}"></i>${p.email.split('@')[0]}</div><span class="vbuck-color font-bold">${p.balance}</span></div>`;
+                    const profiles = []; snap.forEach(d => profiles.push({id: d.id, ...d.data()}));
+                    profiles.sort((a,b) => b.balance - a.balance);
+                    profiles.forEach((p, i) => {
+                        let tCol = i===0?'text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)] scale-110':i===1?'text-slate-300 drop-shadow-[0_0_8px_rgba(203,213,225,0.6)]':i===2?'text-amber-600 drop-shadow-[0_0_8px_rgba(217,119,6,0.6)]':'text-slate-600';
+                        list.innerHTML += `
+                            <div class="flex justify-between bg-slate-800/40 hover:bg-slate-700/60 transition-colors p-4 rounded-2xl border border-slate-700/50 items-center">
+                                <div class="flex items-center gap-3"><i data-lucide="medal" class="w-5 h-5 ${tCol} transition-transform"></i> <span class="font-semibold text-slate-200">${p.email.split('@')[0]}</span></div>
+                                <span class="vbuck-color font-black text-lg">${p.balance.toLocaleString()}</span>
+                            </div>`;
                     });
                     lucide.createIcons();
                 });
             } else {
-                 document.getElementById('app-container').classList.add('hidden');
-                 document.getElementById('login-overlay').classList.remove('hidden');
+                document.getElementById('app-container').classList.add('hidden');
+                document.getElementById('login-overlay').classList.remove('hidden');
             }
         });
 
-        window.handleLogin = async () => {
-            const errEl = document.getElementById('login-error');
-            try {
-                await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value);
-                errEl.classList.add('hidden');
-            } catch (error) {
-                errEl.textContent = "Error al iniciar sesión: " + error.message;
-                errEl.classList.remove('hidden');
-            }
-        };
-
-        window.handleRegister = async () => {
-            const errEl = document.getElementById('login-error');
-            try {
-                await createUserWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value);
-                 errEl.classList.add('hidden');
-            } catch (error) {
-                errEl.textContent = "Error al registrar: " + error.message;
-                errEl.classList.remove('hidden');
-            }
-        };
-
-        window.logout = () => signOut(auth);
-
-        window.editBalanceMode = (show) => { document.getElementById('balance-display').classList.toggle('hidden', show); document.getElementById('balance-edit-form').classList.toggle('hidden', !show); if(show) document.getElementById('input-balance').value = currentBalance; };
-        window.saveBalance = async () => { await setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'profile', 'data'), { balance: parseInt(document.getElementById('input-balance').value) }, { merge: true }); window.editBalanceMode(false); };
-        window.add100Vbucks = () => setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'profile', 'data'), { balance: currentBalance + 100 }, { merge: true });
-        
-        window.saveNewGoal = async () => { const name = document.getElementById('input-goal-name').value; const amount = parseInt(document.getElementById('input-goal-amount').value); if(name && amount) { await addDoc(collection(db, 'artifacts', appId, 'users', currentUserId, 'goals'), { name, targetAmount: amount }); window.closeModal('modal-add-goal'); } };
-        window.claimGoal = async (id, amount) => { if(currentBalance >= amount) { await setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'profile', 'data'), { balance: currentBalance - amount }, { merge: true }); await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'goals', id)); } };
-        
+        // FUNCIONES DE LA UI (Nuevos estilos aplicados en los template literals)
         window.renderGoals = () => { 
             document.getElementById('goals-list').innerHTML = goalsData.map(g => { 
-                const progress = Math.min(100, Math.floor((currentBalance / g.targetAmount) * 100));
+                const progress = Math.min(100, Math.floor((currentBalance / g.targetAmount) * 100)); 
+                const missing = Math.max(0, g.targetAmount - currentBalance);
                 const canClaim = currentBalance >= g.targetAmount;
-                return `<div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                    <div class="flex justify-between mb-2 text-sm font-bold"><span>${g.name}</span><span class="vbuck-color">${progress}% (${g.targetAmount})</span></div>
-                    <div class="w-full bg-slate-900 rounded-full h-2 mb-3"><div class="vbuck-bg h-2 rounded-full transition-all duration-500" style="width: ${progress}%"></div></div>
-                    <button onclick="window.claimGoal('${g.id}', ${g.targetAmount})" class="w-full ${canClaim ? 'vbuck-bg hover:bg-sky-600' : 'bg-slate-700 cursor-not-allowed opacity-50'} py-2 rounded-lg text-xs font-bold transition" ${canClaim ? '' : 'disabled'}>Reclamar</button>
-                </div>` 
+                return `
+                <div class="bg-slate-800/40 p-5 rounded-2xl border border-slate-700/50 shadow-sm relative overflow-hidden group">
+                    <div class="flex justify-between mb-3 text-sm font-bold">
+                        <span class="text-slate-100">${g.name}</span>
+                        <span class="vbuck-color">${progress}% <span class="text-slate-500 font-normal ml-1">(${g.targetAmount})</span></span>
+                    </div>
+                    <div class="w-full bg-slate-900/80 rounded-full h-3 mb-3 shadow-inner border border-slate-800">
+                        <div class="bg-gradient-to-r from-sky-500 to-cyan-300 h-full rounded-full transition-all duration-700 shadow-[0_0_10px_rgba(56,189,248,0.3)]" style="width: ${progress}%"></div>
+                    </div>
+                    <div class="flex justify-between text-[11px] text-slate-400 mb-4 font-semibold uppercase tracking-wider">
+                        <span>${progress}% LOGRADO</span><span>${missing > 0 ? 'FALTAN ' + missing : '¡DESBLOQUEADO!'}</span>
+                    </div>
+                    <button onclick="window.claimGoal('${g.id}', ${g.targetAmount})" ${canClaim ? '' : 'disabled'} 
+                        class="w-full py-2.5 rounded-xl text-xs font-black transition-all uppercase tracking-widest ${canClaim ? 'vbuck-bg shadow-lg shadow-sky-500/20 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'}">
+                        Reclamar Recompensa
+                    </button>
+                </div>`; 
             }).join(''); 
         };
 
-        window.renderHabits = () => { const today = new Date().toISOString().split('T')[0]; document.getElementById('habits-list').innerHTML = habitsData.map(h => `<div class="flex items-center gap-2 text-sm bg-slate-800 p-2 rounded"><input type="checkbox" onchange="window.toggleHabit('${h.id}', this.checked)" ${h.log?.[today] ? 'checked' : ''}><span>${h.emoji} ${h.name}</span></div>`).join(''); };
-        window.toggleHabit = async (id, checked) => { const today = new Date().toISOString().split('T')[0]; const newList = habitsData.map(h => h.id === id ? {...h, log: {...h.log, [today]: checked}} : h); await setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'habits', 'data'), { list: newList }); };
-        window.saveNewHabit = async () => { const name = document.getElementById('input-habit-name').value; const emoji = document.getElementById('input-habit-emoji').value; if(name) { const newList = [...habitsData, {id: Date.now().toString(), name, emoji, log: {}}]; await setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'habits', 'data'), { list: newList }); window.closeModal('modal-add-habit'); } };
-        
-        window.saveNewStore = async () => { const name = document.getElementById('input-store-name').value; const date = document.getElementById('input-store-date').value; if(name && date) { await addDoc(collection(db, 'artifacts', appId, 'users', currentUserId, 'storeItems'), { name, endDate: date }); window.closeModal('modal-add-store'); } };
-        window.renderStore = () => { document.getElementById('store-list').innerHTML = storeData.map(s => `<div class="bg-slate-800 p-3 rounded-lg text-sm flex justify-between items-center"><span class="font-bold">${s.name}</span><span class="vbuck-color font-mono" data-end="${s.endDate}">...</span></div>`).join(''); };
-        
+        window.renderHabits = () => { 
+            const today = new Date().toISOString().split('T')[0]; 
+            document.getElementById('habits-list').innerHTML = habitsData.map(h => {
+                const checked = h.log?.[today] ? 'checked' : '';
+                return `
+                <label class="flex items-center gap-4 text-sm bg-slate-800/40 hover:bg-slate-700/60 transition-colors p-4 rounded-2xl border border-slate-700/50 cursor-pointer">
+                    <div class="relative flex items-center justify-center">
+                        <input type="checkbox" onchange="window.toggleHabit('${h.id}', this.checked)" ${checked} class="peer absolute opacity-0 w-full h-full cursor-pointer z-10">
+                        <div class="w-6 h-6 rounded-lg border-2 border-slate-500 peer-checked:bg-sky-500 peer-checked:border-sky-500 flex items-center justify-center transition-all shadow-inner">
+                            <svg class="w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                    </div>
+                    <span class="text-2xl drop-shadow-md">${h.emoji}</span>
+                    <span class="font-bold text-slate-200 peer-checked:text-slate-500 peer-checked:line-through transition-all">${h.name}</span>
+                </label>`;
+            }).join(''); 
+        };
+
+        window.renderStore = () => { 
+            document.getElementById('store-list').innerHTML = storeData.map(s => `
+                <div class="bg-slate-800/40 p-4 rounded-2xl border border-slate-700/50 flex justify-between items-center shadow-sm">
+                    <span class="font-bold text-slate-200">${s.name}</span>
+                    <span class="bg-slate-900/80 text-sky-400 font-mono px-3 py-1.5 rounded-lg border border-slate-800 shadow-inner text-xs font-bold" data-end="${s.endDate}">...</span>
+                </div>
+            `).join(''); 
+        };
+
         window.renderCalendar = () => { 
             const grid = document.getElementById('calendar-grid'); grid.innerHTML = ''; 
-            const daysInMonth = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0).getDate(); 
-            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            document.getElementById('calendar-month-year').textContent = `${monthNames[currentCalendarDate.getMonth()]} ${currentCalendarDate.getFullYear()}`;
-            
-            // Add day headers
-            const dayNames = ['DOM', 'LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB'];
-            dayNames.forEach(d => { grid.innerHTML += `<div class="text-slate-500 font-bold mb-2">${d}</div>`; });
-            
-            const firstDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1).getDay();
-            for(let i=0; i<firstDay; i++) { grid.innerHTML += `<div></div>`; } // Empty padding
-            
+            const daysInMonth = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0).getDate();
+            document.getElementById('calendar-month-year').textContent = currentCalendarDate.toLocaleDateString('es', { month: 'long', year: 'numeric' });
             for(let i = 1; i <= daysInMonth; i++) { 
                 const d = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), i); 
                 const today = new Date(); today.setHours(0,0,0,0); 
-                const diff = d >= today ? Math.max(0, (d - today) / 86400000) : 0; 
-                grid.innerHTML += `<div class="p-2 bg-slate-800 rounded text-[10px] ${d.getTime() === today.getTime() ? 'border border-sky-500 shadow-[0_0_10px_rgba(14,165,233,0.3)]' : ''}"><span class="${d.getTime() < today.getTime() ? 'text-slate-600' : 'text-slate-300'}">${i}</span><br><span class="vbuck-color font-bold ${d.getTime() < today.getTime() ? 'opacity-50' : ''}">${currentBalance + (diff * 100)}</span></div>`; 
+                const isToday = d.getTime() === today.getTime();
+                const isPast = d.getTime() < today.getTime();
+                const diffDays = d >= today ? Math.max(0, (d - today) / 86400000) : 0; 
+                
+                let boxClass = isToday ? 'bg-gradient-to-br from-sky-900/60 to-slate-800/60 border border-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.25)]' : (isPast ? 'bg-slate-900/30 border border-transparent opacity-50' : 'bg-slate-800/40 border border-slate-700/50 hover:border-slate-500 transition-colors');
+                let txtClass = isToday ? 'text-sky-400 font-black' : (isPast ? 'text-slate-600' : 'text-slate-300 font-bold');
+                
+                grid.innerHTML += `<div class="p-2 md:p-3 rounded-2xl flex flex-col justify-between min-h-[70px] ${boxClass}">
+                    <span class="${txtClass} text-left leading-none">${i}</span>
+                    <span class="vbuck-color font-black text-right tracking-tighter mt-2 drop-shadow-md text-sm md:text-base">${currentBalance + (diffDays * 100)}</span>
+                </div>`; 
             } 
         };
-        window.changeMonth = (d) => { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + d); window.renderCalendar(); };
-        window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
-        window.openGoalModal = () => document.getElementById('modal-add-goal').classList.remove('hidden');
 
+        // LÓGICA DE DATOS
+        window.editBalanceMode = (show) => { document.getElementById('balance-display').classList.toggle('hidden', show); document.getElementById('balance-edit-form').classList.toggle('hidden', !show); if(show) document.getElementById('input-balance').value = currentBalance; };
+        window.saveBalance = async () => { await setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'profile', 'data'), { balance: parseInt(document.getElementById('input-balance').value) }, { merge: true }); window.editBalanceMode(false); };
+        window.add100Vbucks = () => setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'profile', 'data'), { balance: currentBalance + 100 }, { merge: true });
+        window.saveNewGoal = async () => { const name = document.getElementById('input-goal-name').value; const amount = parseInt(document.getElementById('input-goal-amount').value); if(name && amount) { await addDoc(collection(db, 'artifacts', appId, 'users', currentUserId, 'goals'), { name, targetAmount: amount }); window.closeModal('modal-add-goal'); } };
+        window.claimGoal = async (id, amount) => { if(currentBalance >= amount) { await setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'profile', 'data'), { balance: currentBalance - amount }, { merge: true }); await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'goals', id)); } };
+        window.toggleHabit = async (id, checked) => { const today = new Date().toISOString().split('T')[0]; const newList = habitsData.map(h => h.id === id ? {...h, log: {...h.log, [today]: checked}} : h); await setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'habits', 'data'), { list: newList }); };
+        window.saveNewHabit = async () => { const name = document.getElementById('input-habit-name').value; const emoji = document.getElementById('input-habit-emoji').value; if(name) { const newList = [...habitsData, {id: Date.now().toString(), name, emoji, log: {}}]; await setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'habits', 'data'), { list: newList }); window.closeModal('modal-add-habit'); } };
+        window.saveNewStore = async () => { const name = document.getElementById('input-store-name').value; const date = document.getElementById('input-store-date').value; if(name && date) { await addDoc(collection(db, 'artifacts', appId, 'users', currentUserId, 'storeItems'), { name, endDate: date }); window.closeModal('modal-add-store'); } };
+        window.changeMonth = (d) => { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + d); window.renderCalendar(); };
+        window.closeModal = (id) => { document.getElementById(id).classList.add('hidden'); document.querySelectorAll(`#${id} input`).forEach(i => i.value=''); };
+        window.openGoalModal = () => document.getElementById('modal-add-goal').classList.remove('hidden');
+        
+        window.handleLogin = () => signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value).catch(e => { document.getElementById('login-error').textContent="Error: "+e.message; document.getElementById('login-error').classList.remove('hidden'); });
+        window.handleRegister = () => createUserWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value).catch(e => { document.getElementById('login-error').textContent="Error: "+e.message; document.getElementById('login-error').classList.remove('hidden'); });
+        window.logout = () => signOut(auth);
+
+        // TEMPORIZADORES (Reloj Principal y Tienda)
         setInterval(() => {
             const now = new Date(); 
-            
-            // Main Timer Logic
             const target = new Date(now); target.setHours(19, 0, 0, 0); if(now > target) target.setDate(target.getDate() + 1);
-            const diffMain = target - now;
+            const diff = target - now;
             
-            document.getElementById('timer-days').textContent = String(Math.floor(diffMain / 86400000)).padStart(2, '0');
-            document.getElementById('timer-hours').textContent = String(Math.floor((diffMain % 86400000) / 3600000)).padStart(2, '0');
-            document.getElementById('timer-mins').textContent = String(Math.floor((diffMain % 3600000) / 60000)).padStart(2, '0');
-            document.getElementById('timer-secs').textContent = String(Math.floor((diffMain % 60000) / 1000)).padStart(2, '0');
-
-            // Store Logic
+            document.getElementById('timer-days').textContent = String(Math.floor(diff / 86400000)).padStart(2, '0');
+            document.getElementById('timer-hours').textContent = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0');
+            document.getElementById('timer-mins').textContent = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+            document.getElementById('timer-secs').textContent = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+            
             document.querySelectorAll('[data-end]').forEach(el => {
-                const dateStr = el.dataset.end;
-                const [year, month, day] = dateStr.split('-');
-                const end = new Date(year, month - 1, day, 18, 59, 0, 0);
-                
-                const diff = end - now;
-                if (diff > 0) {
-                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-                    const m = Math.floor((diff / 1000 / 60) % 60);
-                    const s = Math.floor((diff / 1000) % 60);
-                    el.textContent = `${d}d ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                const end = new Date(el.dataset.end); end.setHours(18, 59, 0, 0);
+                const d2 = end - now;
+                if(d2 > 0) {
+                    const d = Math.floor(d2 / 86400000);
+                    const h = Math.floor((d2 % 86400000) / 3600000);
+                    const m = Math.floor((d2 % 3600000) / 60000);
+                    el.textContent = `${d}d ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m`;
                 } else {
                     el.textContent = "Finalizado";
-                    el.classList.replace('vbuck-color', 'text-red-400');
+                    el.classList.replace('text-sky-400', 'text-red-400');
                 }
             });
         }, 1000);
+        
         lucide.createIcons();
     </script>
 </body>
